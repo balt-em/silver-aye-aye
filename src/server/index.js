@@ -7,6 +7,7 @@ global.openDialog = publicUiFunctions.openDialog;
 global.openDialogBootstrap = publicUiFunctions.openDialogBootstrap;
 global.openAboutSidebar = publicUiFunctions.openAboutSidebar;
 global.getSheetsData = publicSheetFunctions.getSheetsData;
+global.getSheetValues = publicSheetFunctions.getSheetValues;
 global.addSheet = publicSheetFunctions.addSheet;
 global.deleteSheet = publicSheetFunctions.deleteSheet;
 global.setActiveSheet = publicSheetFunctions.setActiveSheet;

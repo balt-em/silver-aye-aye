@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React, { useState, useEffect } from 'react';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import FormInput from './FormInput';
@@ -8,6 +9,16 @@ import server from '../../utils/server';
 
 const { serverFunctions } = server;
 
+// eslint-disable-next-line no-unused-vars
+function doTheThings(data) {
+  console.log(data);
+}
+
+// // eslint-disable-next-line no-unused-vars
+// const doTheThings2 = data => {
+//   setNames(data);
+// }
+
 const SheetEditor = () => {
   const [names, setNames] = useState([]);
 
@@ -15,21 +26,45 @@ const SheetEditor = () => {
     // Call a server global function here and handle the response with .then() and .catch()
     serverFunctions
       .getSheetsData()
-      .then(setNames)
+      .then(data => {
+        setNames(data);
+        console.log('MAGIC 2');
+        console.log('data', data);
+        console.log('serverFunctions', serverFunctions);
+      })
+      .catch(alert);
+  }, []);
+
+  useEffect(() => {
+    // Call a server global function here and handle the response with .then() and .catch()
+    serverFunctions
+      .getSheetValues()
+      .then(data => {
+        // setNames(data);
+        console.log('awwwwww yeahhhhhhhhh');
+        console.log('Sheet Values!', data);
+        // console.log('serverFunctions', serverFunctions);
+      })
       .catch(alert);
   }, []);
 
   const deleteSheet = sheetIndex => {
     serverFunctions
       .deleteSheet(sheetIndex)
-      .then(setNames)
+      .then(data => {
+        setNames(data);
+        console.log('MAGIC 1');
+      })
       .catch(alert);
   };
 
   const setActiveSheet = sheetName => {
     serverFunctions
       .setActiveSheet(sheetName)
-      .then(setNames)
+      .then(data => {
+        setNames(data);
+        console.log('MAGIC');
+      })
       .catch(alert);
   };
 
@@ -39,6 +74,7 @@ const SheetEditor = () => {
     try {
       const response = await serverFunctions.addSheet(newSheetName);
       setNames(response);
+      console.log('MAGIC 3');
     } catch (error) {
       // eslint-disable-next-line no-alert
       alert(error);
@@ -48,7 +84,7 @@ const SheetEditor = () => {
   return (
     <div>
       <p>
-        <b>☀️ React demo! ☀️</b>
+        <b>☀️ React demo! HEYO ☀️</b>
       </p>
       <p>
         This is a sample page that demonstrates a simple React app. Enter a name
