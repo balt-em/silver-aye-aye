@@ -39,6 +39,16 @@
 
 <br/>
 
+## 🔎 Github Workflow
+
+- When you want to make some new changes to the repository
+  - Create a new branch that's named somewhat resonably (related to the change you trying to make)
+  - Make changes test them etc.
+  - Commit and push to the branch
+  - Make a pull request
+  - Get a review
+  - Merge to master when one other person approves it
+
 ## 🔎 About <a name = "about"></a>
 
 [Google Apps Script](https://developers.google.com/apps-script/overview) is Google's Javascript-based development platform for building applications and add-ons for Google Sheets, Docs, Forms and other Google Apps.
@@ -148,34 +158,34 @@ There are two steps to getting started: installing a certificate (first time onl
 
 1. Generating a certificate for local development <a name = "generatingcerts"></a>
 
-    Install the mkcert package:
+   Install the mkcert package:
 
-    ```bash
-    # mac:
-    $ brew install mkcert
+   ```bash
+   # mac:
+   $ brew install mkcert
 
-    # windows:
-    $ choco install mkcert
-    ```
+   # windows:
+   $ choco install mkcert
+   ```
 
-    [More install options here.](https://github.com/FiloSottile/mkcert#installation)
+   [More install options here.](https://github.com/FiloSottile/mkcert#installation)
 
-    Then run the mkcert install script:
+   Then run the mkcert install script:
 
-    ```bash
-    $ mkcert -install
-    ```
+   ```bash
+   $ mkcert -install
+   ```
 
-    Create the certs in your repo:
+   Create the certs in your repo:
 
-    ```
-    npm run setup:https
-    ```
+   ```
+   npm run setup:https
+   ```
 
 2. Now you're ready to start:
-    ```bash
-    npm run start
-    ```
+   ```bash
+   npm run start
+   ```
 
 The start command will create and deploy a development build, and serve your local files.
 
@@ -200,9 +210,9 @@ You will need to use the "standalone" version of React DevTools since our React 
 
 1. In your repo install the React DevTools package as a dev dependency:
 
-    ```bash
-    npm install -D react-devtools
-    ```
+   ```bash
+   npm install -D react-devtools
+   ```
 
 2. In a new terminal window run `npx react-devtools` to launch the DevTools standalone app.
 
@@ -210,7 +220,7 @@ You will need to use the "standalone" version of React DevTools since our React 
 
 4. Deploy your app (`npm run deploy:dev`) and you should see DevTools tool running and displaying your app hierarchy.
 
-    <img width="100%" src="https://user-images.githubusercontent.com/31550519/110273600-ee9eae80-7f9a-11eb-9796-31353b47dfa8.gif">
+   <img width="100%" src="https://user-images.githubusercontent.com/31550519/110273600-ee9eae80-7f9a-11eb-9796-31353b47dfa8.gif">
 
 5. Don't forget to remove the `<script>` tag before deploying to production.
 

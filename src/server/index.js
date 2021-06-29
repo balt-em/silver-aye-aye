@@ -1,7 +1,16 @@
 import * as publicUiFunctions from './ui';
 import * as publicSheetFunctions from './sheets';
 
+const doGet = () => {
+  const title = 'BALT Starter';
+  const fileName = 'dialog-demo-bootstrap.html';
+  return HtmlService.createHtmlOutputFromFile(fileName)
+    .setTitle(title)
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DEFAULT);
+};
+
 // Expose public functions by attaching to `global`
+global.doGet = doGet;
 global.onOpen = publicUiFunctions.onOpen;
 global.openDialog = publicUiFunctions.openDialog;
 global.openDialogBootstrap = publicUiFunctions.openDialogBootstrap;
