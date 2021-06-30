@@ -1,6 +1,7 @@
-const getSheets = () => SpreadsheetApp.getActive().getSheets();
+const spreadsheetUrl = 'https://docs.google.com/spreadsheets/d/1GWh-B_IMmvNniy2p82CKQ9X-eepwx70BG50xCM5r2bo/edit#gid=0';
+const getSheets = () => SpreadsheetApp.openByUrl(spreadsheetUrl).getSheets();
 
-const getActiveSheetName = () => SpreadsheetApp.getActive().getSheetName();
+const getActiveSheetName = () => SpreadsheetApp.openByUrl(spreadsheetUrl).getSheetName();
 
 export const getSheetsData = () => {
   const activeSheetName = getActiveSheetName();

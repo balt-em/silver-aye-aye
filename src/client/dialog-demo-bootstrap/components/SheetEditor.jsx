@@ -48,7 +48,7 @@ const SheetEditor = () => {
         <b>☀️ Bootstrap demo! ☀️</b>
       </p>
       <p>
-        This is a sample app that uses the <code>react-bootstrap</code> library
+        Hello World This is a sample app that uses the <code>react-bootstrap</code> library
         to help us build a simple React app. Enter a name for a new sheet, hit
         enter and the new sheet will be created. Click the red{' '}
         <span className="text-danger">&times;</span> next to the sheet name to
