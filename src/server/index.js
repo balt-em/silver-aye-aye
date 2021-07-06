@@ -11,6 +11,7 @@ const doGet = () => {
 
 // Expose public functions by attaching to `global`
 global.doGet = doGet;
+global.onEdit = publicSheetFunctions.onEdit;
 global.onOpen = publicUiFunctions.onOpen;
 global.openDialog = publicUiFunctions.openDialog;
 global.openDialogBootstrap = publicUiFunctions.openDialogBootstrap;

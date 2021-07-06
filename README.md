@@ -42,7 +42,7 @@
 ## 🔎 Github Workflow
 
 - When you want to make some new changes to the repository
-  - Create a new branch that's named somewhat resonably (related to the change you trying to make)
+  - Create a new branch that's named somewhat reasonably (related to the change you trying to make)
   - Make changes test them etc.
   - Commit and push to the branch
   - Make a pull request
