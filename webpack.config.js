@@ -24,6 +24,8 @@ envVars.NODE_ENV = process.env.NODE_ENV;
 envVars.PORT = PORT;
 
 const isProd = process.env.NODE_ENV === 'production';
+// undefined, server or ui. Used to only build/push what you need to speed deployment
+const buildMode = process.env.MODE;
 
 /*********************************
  *    define entrypoints
@@ -266,18 +268,18 @@ const serverConfig = {
   module: {
     rules: [
       // typescript config
-      {
-        test: /\.tsx?$/,
-        exclude: /node_modules/,
-        use: [
-          {
-            loader: 'babel-loader',
-          },
-          {
-            loader: 'ts-loader',
-          },
-        ],
-      },
+      // {
+      //   test: /\.tsx?$/,
+      //   exclude: /node_modules/,
+      //   use: [
+      //     {
+      //       loader: 'babel-loader',
+      //     },
+      //     {
+      //       loader: 'ts-loader',
+      //     },
+      //   ],
+      // },
       {
         test: /\.js$/,
         exclude: /node_modules/,
@@ -330,10 +332,10 @@ module.exports = [
   // 2. Set up webpack dev server during development
   // Note: devServer settings are only read in the first element when module.exports is an array
   { ...copyFilesConfig, ...(isProd ? {} : { devServer }) },
-  // 3. Create the server bundle
-  serverConfig,
+  // 3. Create the server bundle if no build mode or server build mode
+  !buildMode || buildMode === 'server' ? serverConfig : undefined,
   // 4. Create one client bundle for each client entrypoint.
-  ...clientConfigs,
+  ...(!buildMode || buildMode === 'ui' ? clientConfigs : []),
   // 5. Create a development dialog bundle for each client entrypoint during development.
   ...(isProd ? [] : devClientConfigs),
 ];
