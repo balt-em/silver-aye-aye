@@ -24,6 +24,8 @@ envVars.NODE_ENV = process.env.NODE_ENV;
 envVars.PORT = PORT;
 
 const isProd = process.env.NODE_ENV === 'production';
+// undefined, server or ui. Used to only build/push what you need to speed deployment
+const buildMode = process.env.MODE;
 
 /*********************************
  *    define entrypoints
@@ -43,23 +45,23 @@ const devDialogEntry = './dev/index.js';
 // define client entry points and output names
 const clientEntrypoints = [
   {
-    name: 'CLIENT - Dialog Demo',
-    entry: './src/client/dialog-demo/index.js',
-    filename: 'dialog-demo', // we'll add the .html suffix to these
-    template: './src/client/dialog-demo/index.html',
+    name: 'CLIENT - Silver Aye Aye',
+    entry: './src/client/webapp/index.js',
+    filename: 'webapp',
+    template: './src/client/webapp/index.html',
   },
-  {
-    name: 'CLIENT - Dialog Demo Bootstrap',
-    entry: './src/client/dialog-demo-bootstrap/index.js',
-    filename: 'dialog-demo-bootstrap',
-    template: './src/client/dialog-demo-bootstrap/index.html',
-  },
-  {
-    name: 'CLIENT - Sidebar About Page',
-    entry: './src/client/sidebar-about-page/index.js',
-    filename: 'sidebar-about-page',
-    template: './src/client/sidebar-about-page/index.html',
-  },
+  // {
+  //   name: 'CLIENT - Dialog Demo',
+  //   entry: './src/client/dialog-demo/index.js',
+  //   filename: 'dialog-demo', // we'll add the .html suffix to these
+  //   template: './src/client/dialog-demo/index.html',
+  // },
+  // {
+  //   name: 'CLIENT - Sidebar About Page',
+  //   entry: './src/client/sidebar-about-page/index.js',
+  //   filename: 'sidebar-about-page',
+  //   template: './src/client/sidebar-about-page/index.html',
+  // },
 ];
 
 // define certificate locations
@@ -266,18 +268,18 @@ const serverConfig = {
   module: {
     rules: [
       // typescript config
-      {
-        test: /\.tsx?$/,
-        exclude: /node_modules/,
-        use: [
-          {
-            loader: 'babel-loader',
-          },
-          {
-            loader: 'ts-loader',
-          },
-        ],
-      },
+      // {
+      //   test: /\.tsx?$/,
+      //   exclude: /node_modules/,
+      //   use: [
+      //     {
+      //       loader: 'babel-loader',
+      //     },
+      //     {
+      //       loader: 'ts-loader',
+      //     },
+      //   ],
+      // },
       {
         test: /\.js$/,
         exclude: /node_modules/,
@@ -330,10 +332,10 @@ module.exports = [
   // 2. Set up webpack dev server during development
   // Note: devServer settings are only read in the first element when module.exports is an array
   { ...copyFilesConfig, ...(isProd ? {} : { devServer }) },
-  // 3. Create the server bundle
-  serverConfig,
+  // 3. Create the server bundle if no build mode or server build mode
+  ...(!buildMode || buildMode === 'server' ? [serverConfig] : []),
   // 4. Create one client bundle for each client entrypoint.
-  ...clientConfigs,
+  ...(!buildMode || buildMode === 'ui' ? clientConfigs : []),
   // 5. Create a development dialog bundle for each client entrypoint during development.
   ...(isProd ? [] : devClientConfigs),
 ];
