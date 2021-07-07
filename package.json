@@ -17,8 +17,8 @@
     "build:ui": "cross-env NODE_ENV=production MODE=ui webpack",
     "build": "cross-env NODE_ENV=production webpack",
     "deploy:dev": "rimraf dist && npm run build:dev && npx clasp push",
-    "deploy:server": "rimraf dist && npm run build:server && npx clasp push",
-    "deploy:ui": "rimraf dist && npm run build:ui && npx clasp push",
+    "deploy:server": "npm run build:server && npx clasp push",
+    "deploy:ui": "npm run build:ui && npx clasp push",
     "deploy": "rimraf dist && npm run build && npx clasp push",
     "serve": "cross-env NODE_ENV=development webpack-dev-server",
     "start": "npm run deploy:dev && npm run serve"

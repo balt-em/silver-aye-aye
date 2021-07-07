@@ -48,9 +48,10 @@ const SheetEditor = () => {
         <b>☀️ Bootstrap demo! ☀️</b>
       </p>
       <p>
-        NYAN!!! Enter a name for a new sheet, hit enter and the new sheet will
-        be created. Click the red <span className="text-danger">&times;</span>{' '}
-        next to the sheet name to delete it.
+        NYAN NYAN!!! Enter a name for a new sheet, hit enter and the new sheet
+        will be created. Click the red{' '}
+        <span className="text-danger">&times;</span> next to the sheet name to
+        delete it.
       </p>
       <FormInput submitNewSheet={submitNewSheet} />
       <ListGroup>

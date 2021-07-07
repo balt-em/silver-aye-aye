@@ -333,7 +333,7 @@ module.exports = [
   // Note: devServer settings are only read in the first element when module.exports is an array
   { ...copyFilesConfig, ...(isProd ? {} : { devServer }) },
   // 3. Create the server bundle if no build mode or server build mode
-  !buildMode || buildMode === 'server' ? serverConfig : undefined,
+  ...(!buildMode || buildMode === 'server' ? [serverConfig] : []),
   // 4. Create one client bundle for each client entrypoint.
   ...(!buildMode || buildMode === 'ui' ? clientConfigs : []),
   // 5. Create a development dialog bundle for each client entrypoint during development.
