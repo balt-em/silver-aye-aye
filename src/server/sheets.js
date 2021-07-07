@@ -1,5 +1,23 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable no-console */
+
+const [
+  intakeFormSheetIndex,
+  clientSheetIndex,
+  paymentBreakdownSheetIndex,
+  paymentOverviewSheetIndex,
+] = [0, 1, 2, 3];
+
+const [
+  paymentIdIndexOnPaymentOverview,
+  rateIndexOnPaymentOverview,
+  datePaidIndexOnPaymentOverview,
+  paidByIndexOnPaymentOverview,
+  reciptUrlIndexOnPaymentOverview,
+  totalIndexOnPaymentOverview,
+] = [0, 1, 2, 3, 4, 5];
+
 const spreadsheetUrl =
   'https://docs.google.com/spreadsheets/d/1GWh-B_IMmvNniy2p82CKQ9X-eepwx70BG50xCM5r2bo/edit#gid=0';
 
@@ -33,39 +51,58 @@ export const onEdit = e => {
 
   const sheets = getSheets(false);
   const sheetValues = sheets.map(sheet => sheet.getDataRange().getValues());
-  // eslint-disable-next-line no-unused-vars
-  const [intake, clientData, paymentData, paymentOverviewData] = sheetValues;
-  console.log('paymentData', paymentData);
-  console.log('paymentOverviewData', paymentOverviewData);
+  const [_, _a, paymentBreakdownData, paymentOverviewData] = sheetValues; // TODO: use indexes
 
   // for each item in payment overview, add to dictionary paymentId: rate
   paymentOverviewData.shift(); // removes first element
   const paymentRateDict = {};
 
   paymentOverviewData.forEach(row => {
-    paymentRateDict[row[0]] = row[1];
+    paymentRateDict[paymentIdIndexOnPaymentOverview] =
+      row[rateIndexOnPaymentOverview];
   });
 
   console.log(paymentRateDict);
 
-  paymentData.shift();
-  // for each payment in payments, figure out how many days are from start to end
-  paymentData.forEach(row => {
-    const [clientId, paymentId, startDate, endDate] = row;
-    const dateDif = getDateDif(startDate, endDate);
-    console.log(
-      'clientId, paymentId, startDate, endDate',
-      clientId,
-      paymentId,
-      startDate,
-      endDate
-    );
-    const cost = dateDif * paymentRateDict[paymentId];
-    console.log('cost', cost);
-    // const paymentId = row[]
+  paymentBreakdownData.shift();
+  const paymentTotalCostDict = {};
+  const clientTotalCostDict = {};
 
-    // using the paymentID, get the rate, and multiply it by the number of days
+  paymentBreakdownData.forEach(row => {
+    const [clientId, paymentId, startDate, endDate] = row; // TODO: use indexes
+    const dateDif = getDateDif(startDate, endDate);
+    const rate = paymentRateDict[paymentId];
+    const cost = dateDif * rate;
+
+    if (paymentTotalCostDict[paymentId]) {
+      paymentTotalCostDict[paymentId] += cost;
+    } else {
+      paymentTotalCostDict[paymentId] = cost;
+    }
+
+    if (clientTotalCostDict[clientId]) {
+      clientTotalCostDict[clientId] += cost;
+    } else {
+      clientTotalCostDict[clientId] = cost;
+    }
   });
+
+  const paymentOverviewSheet = sheets[paymentOverviewSheetIndex]; // get payment overview sheet
+  const totalsRange = paymentOverviewSheet.getRange(
+    2,
+    totalIndexOnPaymentOverview,
+    paymentOverviewSheet.getLastRow() - 1,
+    1
+  );
+
+  const paymentTotals = paymentOverviewData.map(row => {
+    const paymentId = row[paymentIdIndexOnPaymentOverview];
+    const cost = paymentTotalCostDict[paymentId];
+    return [cost];
+  });
+  // payment total might look like this [ [620], [320], [1056] ]
+
+  totalsRange.setValues(paymentTotals);
 
   // make a new dictionary paymentId: total paid in that payment
   // make a new dictionary clientId: total paid on behalf of that client
