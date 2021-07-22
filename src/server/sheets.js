@@ -32,7 +32,7 @@ const [
   clientIdIndexOnClientSheet,
   clientsNameIndexOnClientSheet,
   totalPaidIndexOnClientSheet,
-  totalOwedIndexOnClientSheet,
+  numberOfDaysOwedIndexOnClientSheet,
   paidThroughDateIndexOnClientSheet,
   paymentPickupDateIndexOnClientSheet,
   reimbursementOwedIndexOnClientSheet,
@@ -67,7 +67,7 @@ function getDateDif(date1, date2) {
   const firstDate = date1;
   const secondDate = date2;
 
-  return Math.round(Math.abs((firstDate - secondDate) / oneDay)) + 1;
+  return Math.floor(Math.abs((firstDate - secondDate) / oneDay)) + 1;
 }
 
 // take a boolean 'useUrl', you have to use a URL if calling from the UI, and can't use one if the
@@ -128,10 +128,49 @@ function updateTotalCosts(
 
   console.log(paymentRateDict);
 
+  const paymentStartDateDataDict = {};
+  paymentBreakdownData.forEach(row => {
+    // get the paymentBreakdown data, iterate through each row, return clientID, startDate, endDate
+    const clientId = row[clientIdIndexOnPaymentSheet];
+    const startDate = row[startDateIndexOnPaymentSheet];
+
+    // Get the startDate already assigned to that id in the dictionary, if there is one
+    const oldStartDate = paymentStartDateDataDict[clientId];
+    // See if there was a startDate already assigned to that id in the dictionary
+    if (oldStartDate) {
+      // if the oldStartDate is greater than the startDate
+      if (oldStartDate > startDate) {
+        // assign the startDate to the dictionary
+        paymentStartDateDataDict[clientId] = startDate;
+      } else {
+        // else assign the oldStartDate to the dictionary
+        paymentStartDateDataDict[clientId] = oldStartDate;
+      }
+    } else {
+      paymentStartDateDataDict[clientId] = startDate;
+    }
+
+    // get the earliest start date for each clientId
+    // clientId = paymentStartDateDataDict[startDate];
+    const endDate = row[endDateIndexOnPaymentSheet];
+  });
+  // get the earliest startDate
+  // console.log('Showuphere', paymentStartDateDataDict);
+
+  // TODO: FAKE DATA, get the real data above
+  const paidThroughDateDict = {
+    892: new Date('5/21/21'),
+    131: new Date('7/20/21'),
+    456: new Date('5/21/21'),
+    111: undefined,
+    123: new Date('5/21/21'),
+  };
+
   const paymentTotalCostDict = {};
   const clientTotalCostDict = {};
   const clientReimbursementOwedDict = {};
   const reimbursementUsedDict = {};
+  const amountOwedDict = {};
 
   paymentBreakdownData.forEach(row => {
     // calculate the paymentPickUpDate, paidThroughDate while looping through here
@@ -147,17 +186,20 @@ function updateTotalCosts(
     const dateDif = getDateDif(startDate, endDate);
     const rate = paymentRateDict[paymentId];
 
-    let amountToReimburse = 0;
     if (terminationDate && terminationDate < endDate) {
       const daysOverpaid = getDateDif(terminationDate, endDate);
-      amountToReimburse = daysOverpaid * rate;
+      clientReimbursementOwedDict[clientId] = daysOverpaid * rate;
     }
-    clientReimbursementOwedDict[clientId] = amountToReimburse;
 
     let cost = dateDif * rate;
     if (reimbursement === 'y') {
       cost = -cost;
       reimbursementUsedDict[clientId] = cost;
+      if (clientReimbursementOwedDict[clientId]) {
+        clientReimbursementOwedDict[clientId] += cost;
+      } else {
+        clientReimbursementOwedDict[clientId] = cost;
+      }
     }
 
     if (paymentTotalCostDict[paymentId]) {
@@ -173,35 +215,26 @@ function updateTotalCosts(
     }
   });
 
-  const paymentStartEndDateDataDict = {};
-
-  paymentBreakdownData.forEach(row => {
-    // get the paymentBreakdown data, iterate through each row, return clientID, startDate, endDate
-    const clientId = row[clientIdIndexOnPaymentSheet];
-    const startDate = row[startDateIndexOnPaymentSheet];
-
-    // Get the startDate already assigned to that id in the dictionary, if there is one
-    const oldStartDate = paymentStartEndDateDataDict[clientId];
-    // See if there was a startDate already assigned to that id in the dictionary
-    if (oldStartDate) {
-      // if the oldStartDate is greater than the startDate
-      if (oldStartDate > startDate) {
-        // assign the startDate to the dictionary
-        paymentStartEndDateDataDict[clientId] = startDate;
-      } else {
-        // else assign the oldStartDate to the dictionary
-        paymentStartEndDateDataDict[clientId] = oldStartDate;
-      }
-    } else {
-      paymentStartEndDateDataDict[clientId] = startDate;
+  const daysOwedForClientDict = {};
+  clientData.forEach(row => {
+    const clientId = row[clientIdIndexOnClientSheet];
+    const terminationDate = clientTerminationDateDict[clientId];
+    const paymentDueThroughDate = terminationDate || new Date();
+    const paidThroughDate = paidThroughDateDict[clientId];
+    // don't want to include the date you paid through
+    const dateDif = getDateDif(paymentDueThroughDate, paidThroughDate) - 1;
+    if (dateDif >= 1 && paidThroughDate < paymentDueThroughDate) {
+      daysOwedForClientDict[clientId] = dateDif;
     }
-
-    // get the earliest start date for each clientId
-    // clientId = paymentStartEndDateDataDict[startDate];
-    const endDate = row[endDateIndexOnPaymentSheet];
   });
-  // get the earliest startDate
-  // console.log('Showuphere', paymentStartEndDateDataDict);
+  console.log('daysOwedForClientDict', daysOwedForClientDict);
+
+  updateColumnFromDictionary(
+    sheets[clientSheetIndex],
+    daysOwedForClientDict,
+    clientIdIndexOnClientSheet,
+    numberOfDaysOwedIndexOnClientSheet
+  );
 
   updateColumnFromDictionary(
     sheets[paymentOverviewSheetIndex],
@@ -230,6 +263,10 @@ function updateTotalCosts(
     clientIdIndexOnClientSheet,
     reimbursementOwedIndexOnClientSheet
   );
+
+  // daysOwedForClientDict tells us who we owe for
+  // clientReimbursementOwedDict tell us who we are owed for
+  // need to figure out who to pay for, also should this be cleaned up?
 }
 
 // return { id: terminationDate }
