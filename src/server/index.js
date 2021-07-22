@@ -7,6 +7,7 @@ global.doGet = publicUiFunctions.doGet;
 // global.openDialog = publicUiFunctions.openDialog;
 // global.openDialogBootstrap = publicUiFunctions.openDialogBootstrap;
 // global.openAboutSidebar = publicUiFunctions.openAboutSidebar;
+global.onEdit = publicSheetFunctions.onEdit;
 global.getSheetsData = publicSheetFunctions.getSheetsData;
 global.getSheetValues = publicSheetFunctions.getSheetValues;
 global.addSheet = publicSheetFunctions.addSheet;
