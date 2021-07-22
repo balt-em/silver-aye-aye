@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars */
-/* eslint-disable prefer-destructuring */
 /* eslint-disable no-console */
-// elllllee is here
+
 const [
   intakeFormSheetIndex,
   clientSheetIndex,
@@ -70,6 +69,7 @@ function getDateDif(date1, date2) {
 
   return Math.round(Math.abs((firstDate - secondDate) / oneDay)) + 1;
 }
+
 // take a boolean 'useUrl', you have to use a URL if calling from the UI, and can't use one if the
 // script being run is directly attached to a google sheet (aka onEdit)
 function getSheets(useUrl) {
@@ -80,9 +80,9 @@ function getSheets(useUrl) {
 }
 
 // takes a google sheet, and a dictionary going from some id to a value, a columnWithIdsIndex in the sheet,
-// AND a columnWithIdsIndex which says which column to update with the values
-// Only works if those IDs are unique in that sheet, otherwise it'll update all the ids with the value in the dictionary
-// AKA Can't use on the paymentBreakdown Sheet because the value will get set to multiple ids
+// and a columnToUpdateIndex which says which column to update with the values
+// Only works if those IDs are unique in that sheet, otherwise it'll update all the matching ids with the same value in the dictionary
+// AKA Can't use on the paymentBreakdownSheet because the value will get set to multiple ids
 function updateColumnFromDictionary(
   sheet,
   dictionary,
@@ -109,15 +109,6 @@ function updateColumnFromDictionary(
 
   dataRange.setValues(valuesToSetToSheet);
 }
-
-// function getActiveSheetName(url) {
-//   if (url) {
-//     return SpreadsheetApp.openByUrl(url).getSheetName();
-//   }
-//   return SpreadsheetApp.getActive()
-//     .getSheets()
-//     .getSheetName();
-// }
 
 function updateTotalCosts(
   sheets,
@@ -210,7 +201,7 @@ function updateTotalCosts(
     const endDate = row[endDateIndexOnPaymentSheet];
   });
   // get the earliest startDate
-  console.log('Showuphere', paymentStartEndDateDataDict);
+  // console.log('Showuphere', paymentStartEndDateDataDict);
 
   updateColumnFromDictionary(
     sheets[paymentOverviewSheetIndex],
