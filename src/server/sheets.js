@@ -1,13 +1,23 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable no-console */
-
+// elllllee is here
 const [
   intakeFormSheetIndex,
   clientSheetIndex,
   paymentBreakdownSheetIndex,
   paymentOverviewSheetIndex,
-] = [0, 1, 2, 3];
+] = [...Array(4).keys()];
+
+const [
+  clientIdIndexOnPaymentSheet,
+  paymentIdIndexOnPaymentSheet,
+  startDateIndexOnPaymentSheet,
+  endDateIndexOnPaymentSheet,
+  notesIndexOnPaymentSheet,
+  totalIndexOnPaymentSheet,
+  reimbursementIndexOnPaymentSheet,
+] = [...Array(7).keys()];
 
 const [
   paymentIdIndexOnPaymentOverview,
@@ -16,7 +26,38 @@ const [
   paidByIndexOnPaymentOverview,
   reciptUrlIndexOnPaymentOverview,
   totalIndexOnPaymentOverview,
-] = [0, 1, 2, 3, 4, 5];
+] = [...Array(6).keys()];
+
+const [
+  submittedOnIndexOnClientSheet,
+  clientIdIndexOnClientSheet,
+  clientsNameIndexOnClientSheet,
+  totalPaidIndexOnClientSheet,
+  totalOwedIndexOnClientSheet,
+  paidThroughDateIndexOnClientSheet,
+  paymentPickupDateIndexOnClientSheet,
+  reimbursementOwedIndexOnClientSheet,
+  reimbursementUsedIndexOnClientSheet,
+  terminationDateIndexOnClientSheet,
+  emailIndexOnClientSheet,
+  clientsPhoneNumberIndexOnClientSheet,
+  bestWayToContactClientIndexOnClientSheet,
+  clientsDateOfBirthIndexOnClientSheet,
+  clientsNextCourtDateIndexOnClientSheet,
+  caseNumberIndexOnClientSheet,
+  attorneysNameIndexOnClientSheet,
+  isRepresentationFromPublicDefenderOfficeIndexOnClientSheet,
+  homeDetentionDompanyIndexOnClientSheet,
+  whenClientHookedUpIndexOnClientSheet,
+  whenClientWillBeHookedUpIndexOnClientSheet,
+  knownDrugIssuesIndexOnClientSheet,
+  healthIssuesIndexOnClientSheet,
+  importantClientDetailsIndexOnClientSheet,
+  infoForSomeoneFillingOutOnBehalfOfClientIndexOnClientSheet,
+  confirmedPickupIndexOnClientSheet,
+  rescheuledCourtDateIndexOnClientSheet,
+  notesIndexOnClientSheet,
+] = [...Array(27).keys()];
 
 const spreadsheetUrl =
   'https://docs.google.com/spreadsheets/d/1GWh-B_IMmvNniy2p82CKQ9X-eepwx70BG50xCM5r2bo/edit#gid=0';
@@ -24,17 +65,49 @@ const spreadsheetUrl =
 // https://stackoverflow.com/questions/2627473/how-to-calculate-the-number-of-days-between-two-dates
 function getDateDif(date1, date2) {
   const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
-  const firstDate = new Date(date1);
-  const secondDate = new Date(date2);
+  const firstDate = date1;
+  const secondDate = date2;
 
   return Math.round(Math.abs((firstDate - secondDate) / oneDay)) + 1;
 }
-
-function getSheets(url) {
-  if (url) {
+// take a boolean 'useUrl', you have to use a URL if calling from the UI, and can't use one if the
+// script being run is directly attached to a google sheet (aka onEdit)
+function getSheets(useUrl) {
+  if (useUrl) {
     return SpreadsheetApp.openByUrl(spreadsheetUrl).getSheets();
   }
   return SpreadsheetApp.getActive().getSheets();
+}
+
+// takes a google sheet, and a dictionary going from some id to a value, a columnWithIdsIndex in the sheet,
+// AND a columnWithIdsIndex which says which column to update with the values
+// Only works if those IDs are unique in that sheet, otherwise it'll update all the ids with the value in the dictionary
+// AKA Can't use on the paymentBreakdown Sheet because the value will get set to multiple ids
+function updateColumnFromDictionary(
+  sheet,
+  dictionary,
+  columnWithIdsIndex,
+  columnToUpdateIndex
+) {
+  const sheetValues = sheet
+    .getDataRange()
+    .getValues()
+    .slice(1);
+
+  const dataRange = sheet.getRange(
+    2,
+    columnToUpdateIndex + 1,
+    sheet.getLastRow() - 1,
+    1
+  );
+
+  const valuesToSetToSheet = sheetValues.map(row => {
+    const id = row[columnWithIdsIndex];
+    const value = dictionary[id];
+    return [value];
+  });
+
+  dataRange.setValues(valuesToSetToSheet);
 }
 
 // function getActiveSheetName(url) {
@@ -46,33 +119,55 @@ function getSheets(url) {
 //     .getSheetName();
 // }
 
-export const onEdit = e => {
-  console.log('you edited the thing', e);
-
-  const sheets = getSheets(false);
-  const sheetValues = sheets.map(sheet => sheet.getDataRange().getValues());
-  const [_, _a, paymentBreakdownData, paymentOverviewData] = sheetValues; // TODO: use indexes
-
+function updateTotalCosts(
+  sheets,
+  clientData,
+  paymentBreakdownData,
+  paymentOverviewData,
+  clientTerminationDateDict
+) {
   // for each item in payment overview, add to dictionary paymentId: rate
-  paymentOverviewData.shift(); // removes first element
+
   const paymentRateDict = {};
 
   paymentOverviewData.forEach(row => {
-    paymentRateDict[paymentIdIndexOnPaymentOverview] =
+    paymentRateDict[row[paymentIdIndexOnPaymentOverview]] =
       row[rateIndexOnPaymentOverview];
   });
 
   console.log(paymentRateDict);
 
-  paymentBreakdownData.shift();
   const paymentTotalCostDict = {};
   const clientTotalCostDict = {};
+  const clientReimbursementOwedDict = {};
+  const reimbursementUsedDict = {};
 
   paymentBreakdownData.forEach(row => {
-    const [clientId, paymentId, startDate, endDate] = row; // TODO: use indexes
+    // calculate the paymentPickUpDate, paidThroughDate while looping through here
+    const clientId = row[clientIdIndexOnPaymentSheet];
+    const terminationDate = clientTerminationDateDict[clientId];
+    const paymentId = row[paymentIdIndexOnPaymentSheet];
+    const startDate = new Date(row[startDateIndexOnPaymentSheet]);
+    const endDate = new Date(row[endDateIndexOnPaymentSheet]);
+    const reimbursement = row[reimbursementIndexOnPaymentSheet];
+
+    console.log(clientId, paymentId, startDate, endDate, reimbursement);
+
     const dateDif = getDateDif(startDate, endDate);
     const rate = paymentRateDict[paymentId];
-    const cost = dateDif * rate;
+
+    let amountToReimburse = 0;
+    if (terminationDate && terminationDate < endDate) {
+      const daysOverpaid = getDateDif(terminationDate, endDate);
+      amountToReimburse = daysOverpaid * rate;
+    }
+    clientReimbursementOwedDict[clientId] = amountToReimburse;
+
+    let cost = dateDif * rate;
+    if (reimbursement === 'y') {
+      cost = -cost;
+      reimbursementUsedDict[clientId] = cost;
+    }
 
     if (paymentTotalCostDict[paymentId]) {
       paymentTotalCostDict[paymentId] += cost;
@@ -87,25 +182,102 @@ export const onEdit = e => {
     }
   });
 
-  const paymentOverviewSheet = sheets[paymentOverviewSheetIndex]; // get payment overview sheet
-  const totalsRange = paymentOverviewSheet.getRange(
-    2,
-    totalIndexOnPaymentOverview,
-    paymentOverviewSheet.getLastRow() - 1,
-    1
+  const paymentStartEndDateDataDict = {};
+
+  paymentBreakdownData.forEach(row => {
+    // get the paymentBreakdown data, iterate through each row, return clientID, startDate, endDate
+    const clientId = row[clientIdIndexOnPaymentSheet];
+    const startDate = row[startDateIndexOnPaymentSheet];
+
+    // Get the startDate already assigned to that id in the dictionary, if there is one
+    const oldStartDate = paymentStartEndDateDataDict[clientId];
+    // See if there was a startDate already assigned to that id in the dictionary
+    if (oldStartDate) {
+      // if the oldStartDate is greater than the startDate
+      if (oldStartDate > startDate) {
+        // assign the startDate to the dictionary
+        paymentStartEndDateDataDict[clientId] = startDate;
+      } else {
+        // else assign the oldStartDate to the dictionary
+        paymentStartEndDateDataDict[clientId] = oldStartDate;
+      }
+    } else {
+      paymentStartEndDateDataDict[clientId] = startDate;
+    }
+
+    // get the earliest start date for each clientId
+    // clientId = paymentStartEndDateDataDict[startDate];
+    const endDate = row[endDateIndexOnPaymentSheet];
+  });
+  // get the earliest startDate
+  console.log('Showuphere', paymentStartEndDateDataDict);
+
+  updateColumnFromDictionary(
+    sheets[paymentOverviewSheetIndex],
+    paymentTotalCostDict,
+    paymentIdIndexOnPaymentOverview,
+    totalIndexOnPaymentOverview
   );
 
-  const paymentTotals = paymentOverviewData.map(row => {
-    const paymentId = row[paymentIdIndexOnPaymentOverview];
-    const cost = paymentTotalCostDict[paymentId];
-    return [cost];
+  updateColumnFromDictionary(
+    sheets[clientSheetIndex],
+    reimbursementUsedDict,
+    clientIdIndexOnClientSheet,
+    reimbursementUsedIndexOnClientSheet
+  );
+
+  updateColumnFromDictionary(
+    sheets[clientSheetIndex],
+    clientTotalCostDict,
+    clientIdIndexOnClientSheet,
+    totalPaidIndexOnClientSheet
+  );
+
+  updateColumnFromDictionary(
+    sheets[clientSheetIndex],
+    clientReimbursementOwedDict,
+    clientIdIndexOnClientSheet,
+    reimbursementOwedIndexOnClientSheet
+  );
+}
+
+// return { id: terminationDate }
+function getClientTerminationDateDict(clientData) {
+  const clientTerminationDateDict = {};
+  clientData.forEach(row => {
+    const terminationDate = row[terminationDateIndexOnClientSheet];
+    if (terminationDate) {
+      const clientId = row[clientIdIndexOnClientSheet];
+      clientTerminationDateDict[clientId] = new Date(terminationDate);
+    }
   });
-  // payment total might look like this [ [620], [320], [1056] ]
 
-  totalsRange.setValues(paymentTotals);
+  return clientTerminationDateDict;
+}
 
-  // make a new dictionary paymentId: total paid in that payment
-  // make a new dictionary clientId: total paid on behalf of that client
+export const onEdit = e => {
+  const sheets = getSheets(false);
+  const sheetValues = sheets.map(sheet =>
+    sheet
+      .getDataRange()
+      .getValues()
+      .slice(1)
+  );
+  const clientData = sheetValues[clientSheetIndex];
+  const paymentBreakdownData = sheetValues[paymentBreakdownSheetIndex];
+  const paymentOverviewData = sheetValues[paymentOverviewSheetIndex];
+
+  const clientTerminationDateDict = getClientTerminationDateDict(clientData);
+
+  console.log('clientTerminationDateDict', clientTerminationDateDict);
+
+  updateTotalCosts(
+    sheets,
+    clientData,
+    paymentBreakdownData,
+    paymentOverviewData,
+    clientTerminationDateDict
+  );
 };
 
 export const getSheetsData = () => {
