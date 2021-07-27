@@ -33,8 +33,8 @@ const [
   clientsNameIndexOnClientSheet,
   totalPaidIndexOnClientSheet,
   numberOfDaysOwedIndexOnClientSheet,
-  paidThroughDateIndexOnClientSheet,
   paymentPickupDateIndexOnClientSheet,
+  paidThroughDateIndexOnClientSheet,
   reimbursementOwedIndexOnClientSheet,
   reimbursementUsedIndexOnClientSheet,
   terminationDateIndexOnClientSheet,
@@ -57,7 +57,7 @@ const [
   rescheuledCourtDateIndexOnClientSheet,
   notesIndexOnClientSheet,
 ] = [...Array(27).keys()];
-
+// TODO we need to figure out a better way to assigned sequential numbers for our rows
 const spreadsheetUrl =
   'https://docs.google.com/spreadsheets/d/1GWh-B_IMmvNniy2p82CKQ9X-eepwx70BG50xCM5r2bo/edit#gid=0';
 
@@ -128,43 +128,40 @@ function updateTotalCosts(
 
   console.log(paymentRateDict);
 
-  const paymentStartDateDataDict = {};
+  const paymentPickupDateDict = {};
   paymentBreakdownData.forEach(row => {
     // get the paymentBreakdown data, iterate through each row, return clientID, startDate, endDate
     const clientId = row[clientIdIndexOnPaymentSheet];
     const startDate = row[startDateIndexOnPaymentSheet];
 
     // Get the startDate already assigned to that id in the dictionary, if there is one
-    const oldStartDate = paymentStartDateDataDict[clientId];
+    const oldPaymentPickupDate = paymentPickupDateDict[clientId];
     // See if there was a startDate already assigned to that id in the dictionary
-    if (oldStartDate) {
-      // if the oldStartDate is greater than the startDate
-      if (oldStartDate > startDate) {
-        // assign the startDate to the dictionary
-        paymentStartDateDataDict[clientId] = startDate;
-      } else {
-        // else assign the oldStartDate to the dictionary
-        paymentStartDateDataDict[clientId] = oldStartDate;
-      }
-    } else {
-      paymentStartDateDataDict[clientId] = startDate;
+    if (!oldPaymentPickupDate) {
+      paymentPickupDateDict[clientId] = startDate;
+      // if there is no oldPaymentPickupDate then go to the startDate if the startDate is before the oldPaymentPickupDate then we want to go to the startDate
+    } else if (oldPaymentPickupDate > startDate) {
+      paymentPickupDateDict[clientId] = startDate;
     }
 
-    // get the earliest start date for each clientId
-    // clientId = paymentStartDateDataDict[startDate];
     const endDate = row[endDateIndexOnPaymentSheet];
   });
-  // get the earliest startDate
-  // console.log('Showuphere', paymentStartDateDataDict);
+  //  get the earliest startDate
 
-  // TODO: FAKE DATA, get the real data above
-  const paidThroughDateDict = {
-    892: new Date('5/21/21'),
-    131: new Date('7/20/21'),
-    456: new Date('5/21/21'),
-    111: undefined,
-    123: new Date('5/21/21'),
-  };
+  const paidThroughDateDict = {};
+  paymentBreakdownData.forEach(row => {
+    // get the paymentBreakdown data, iterate through each row, return clientID, startDate, endDate
+    const clientId = row[clientIdIndexOnPaymentSheet];
+    const endDate = row[endDateIndexOnPaymentSheet];
+    const oldPaidThroughDate = paidThroughDateDict[clientId];
+    // See if there was a startDate already assigned to that id in the dictionary
+    if (!oldPaidThroughDate) {
+      paidThroughDateDict[clientId] = endDate;
+      // if there is no oldPaymentPickupDate then go to the startDate if the startDate is before the oldPaymentPickupDate then we want to go to the startDate
+    } else if (oldPaidThroughDate < endDate) {
+      paidThroughDateDict[clientId] = endDate;
+    }
+  });
 
   const paymentTotalCostDict = {};
   const clientTotalCostDict = {};
@@ -264,6 +261,19 @@ function updateTotalCosts(
     reimbursementOwedIndexOnClientSheet
   );
 
+  updateColumnFromDictionary(
+    sheets[clientSheetIndex],
+    paymentPickupDateDict,
+    clientIdIndexOnClientSheet,
+    paymentPickupDateIndexOnClientSheet
+  );
+
+  updateColumnFromDictionary(
+    sheets[clientSheetIndex],
+    paidThroughDateDict,
+    clientIdIndexOnClientSheet,
+    paidThroughDateIndexOnClientSheet
+  );
   // daysOwedForClientDict tells us who we owe for
   // clientReimbursementOwedDict tell us who we are owed for
   // need to figure out who to pay for, also should this be cleaned up?
