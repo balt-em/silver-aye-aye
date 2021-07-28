@@ -85,15 +85,11 @@ function getSheets(useUrl) {
 // AKA Can't use on the paymentBreakdownSheet because the value will get set to multiple ids
 function updateColumnFromDictionary(
   sheet,
+  sheetValues,
   dictionary,
   columnWithIdsIndex,
   columnToUpdateIndex
 ) {
-  const sheetValues = sheet
-    .getDataRange()
-    .getValues()
-    .slice(1);
-
   const dataRange = sheet.getRange(
     2,
     columnToUpdateIndex + 1,
@@ -106,7 +102,6 @@ function updateColumnFromDictionary(
     const value = dictionary[id];
     return [value];
   });
-
   dataRange.setValues(valuesToSetToSheet);
 }
 
@@ -125,8 +120,6 @@ function updateTotalCosts(
     paymentRateDict[row[paymentIdIndexOnPaymentOverview]] =
       row[rateIndexOnPaymentOverview];
   });
-
-  console.log(paymentRateDict);
 
   const paymentPickupDateDict = {};
   paymentBreakdownData.forEach(row => {
@@ -178,8 +171,6 @@ function updateTotalCosts(
     const endDate = new Date(row[endDateIndexOnPaymentSheet]);
     const reimbursement = row[reimbursementIndexOnPaymentSheet];
 
-    console.log(clientId, paymentId, startDate, endDate, reimbursement);
-
     const dateDif = getDateDif(startDate, endDate);
     const rate = paymentRateDict[paymentId];
 
@@ -224,52 +215,69 @@ function updateTotalCosts(
       daysOwedForClientDict[clientId] = dateDif;
     }
   });
-  console.log('daysOwedForClientDict', daysOwedForClientDict);
+
+  const clientSheet = sheets[clientSheetIndex];
+  const clientSheetDataRange = clientSheet
+    .getDataRange()
+    .getValues()
+    .slice(1);
+  const paymentOverviewSheet = sheets[paymentOverviewSheetIndex];
+  const paymentOverviewSheetDataRange = sheets[paymentOverviewSheetIndex]
+    .getDataRange()
+    .getValues()
+    .slice(1);
 
   updateColumnFromDictionary(
-    sheets[clientSheetIndex],
+    clientSheet,
+    clientSheetDataRange,
     daysOwedForClientDict,
     clientIdIndexOnClientSheet,
     numberOfDaysOwedIndexOnClientSheet
   );
 
   updateColumnFromDictionary(
-    sheets[paymentOverviewSheetIndex],
+    paymentOverviewSheet,
+    paymentOverviewSheetDataRange,
     paymentTotalCostDict,
     paymentIdIndexOnPaymentOverview,
     totalIndexOnPaymentOverview
   );
 
   updateColumnFromDictionary(
-    sheets[clientSheetIndex],
+    clientSheet,
+    clientSheetDataRange,
     reimbursementUsedDict,
     clientIdIndexOnClientSheet,
     reimbursementUsedIndexOnClientSheet
   );
 
   updateColumnFromDictionary(
-    sheets[clientSheetIndex],
+    clientSheet,
+    clientSheetDataRange,
     clientTotalCostDict,
     clientIdIndexOnClientSheet,
     totalPaidIndexOnClientSheet
   );
 
   updateColumnFromDictionary(
-    sheets[clientSheetIndex],
+    clientSheet,
+    clientSheetDataRange,
     clientReimbursementOwedDict,
     clientIdIndexOnClientSheet,
     reimbursementOwedIndexOnClientSheet
   );
 
   updateColumnFromDictionary(
-    sheets[clientSheetIndex],
+    clientSheet,
+    clientSheetDataRange,
     paymentPickupDateDict,
     clientIdIndexOnClientSheet,
     paymentPickupDateIndexOnClientSheet
   );
 
   updateColumnFromDictionary(
-    sheets[clientSheetIndex],
+    clientSheet,
+    clientSheetDataRange,
     paidThroughDateDict,
     clientIdIndexOnClientSheet,
     paidThroughDateIndexOnClientSheet
@@ -294,6 +302,7 @@ function getClientTerminationDateDict(clientData) {
 }
 
 export const onEdit = e => {
+  console.time('onEdit time');
   const sheets = getSheets(false);
   const sheetValues = sheets.map(sheet =>
     sheet
@@ -307,8 +316,6 @@ export const onEdit = e => {
 
   const clientTerminationDateDict = getClientTerminationDateDict(clientData);
 
-  console.log('clientTerminationDateDict', clientTerminationDateDict);
-
   updateTotalCosts(
     sheets,
     clientData,
@@ -316,6 +323,7 @@ export const onEdit = e => {
     paymentOverviewData,
     clientTerminationDateDict
   );
+  console.timeEnd('onEdit time');
 };
 
 export const getSheetsData = () => {
