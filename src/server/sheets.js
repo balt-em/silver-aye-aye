@@ -38,6 +38,7 @@ const [
   reimbursementOwedIndexOnClientSheet,
   reimbursementUsedIndexOnClientSheet,
   terminationDateIndexOnClientSheet,
+  homeDetentionCompanyIndexOnClientSheet,
   emailIndexOnClientSheet,
   clientsPhoneNumberIndexOnClientSheet,
   bestWayToContactClientIndexOnClientSheet,
@@ -56,7 +57,7 @@ const [
   confirmedPickupIndexOnClientSheet,
   rescheuledCourtDateIndexOnClientSheet,
   notesIndexOnClientSheet,
-] = [...Array(27).keys()];
+] = [...Array(29).keys()];
 // TODO we need to figure out a better way to assigned sequential numbers for our rows
 const spreadsheetUrl =
   'https://docs.google.com/spreadsheets/d/1GWh-B_IMmvNniy2p82CKQ9X-eepwx70BG50xCM5r2bo/edit#gid=0';
