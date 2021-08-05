@@ -63,12 +63,18 @@ const spreadsheetUrl =
   'https://docs.google.com/spreadsheets/d/1GWh-B_IMmvNniy2p82CKQ9X-eepwx70BG50xCM5r2bo/edit#gid=0';
 
 // https://stackoverflow.com/questions/2627473/how-to-calculate-the-number-of-days-between-two-dates
-function getDateDif(date1, date2) {
+// the difference between two dates including the start OR the end date: 1/1 - 1/1 is 0 days
+function getDateDifExclusive(date1, date2) {
   const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
   const firstDate = date1;
   const secondDate = date2;
 
-  return Math.floor(Math.abs((firstDate - secondDate) / oneDay)) + 1;
+  return Math.floor(Math.abs((firstDate - secondDate) / oneDay));
+}
+
+// the difference between two dates including the start and end date:  1/1 - 1/1 is 1 day
+function getDateDifInclusive(date1, date2) {
+  return getDateDifExclusive(date1, date2) + 1;
 }
 
 // take a boolean 'useUrl', you have to use a URL if calling from the UI, and can't use one if the
@@ -172,15 +178,10 @@ function updateTotalCosts(
     const endDate = new Date(row[endDateIndexOnPaymentSheet]);
     const reimbursement = row[reimbursementIndexOnPaymentSheet];
 
-    const dateDif = getDateDif(startDate, endDate);
+    const inclusiveDateDif = getDateDifInclusive(startDate, endDate);
     const rate = paymentRateDict[paymentId];
 
-    if (terminationDate && terminationDate < endDate) {
-      const daysOverpaid = getDateDif(terminationDate, endDate);
-      clientReimbursementOwedDict[clientId] = daysOverpaid * rate;
-    }
-
-    let cost = dateDif * rate;
+    let cost = inclusiveDateDif * rate;
     if (reimbursement === 'y') {
       cost = -cost;
       reimbursementUsedDict[clientId] = cost;
@@ -202,6 +203,19 @@ function updateTotalCosts(
     } else {
       clientTotalCostDict[clientId] = cost;
     }
+
+    if (reimbursement === 'n' && terminationDate && terminationDate < endDate) {
+      let amountToReimburse = cost;
+      if (startDate < terminationDate) {
+        const daysOverpaid = getDateDifExclusive(terminationDate, endDate);
+        amountToReimburse = daysOverpaid * rate;
+      }
+      if (clientReimbursementOwedDict[clientId]) {
+        clientReimbursementOwedDict[clientId] += amountToReimburse;
+      } else {
+        clientReimbursementOwedDict[clientId] = amountToReimburse;
+      }
+    }
   });
 
   const daysOwedForClientDict = {};
@@ -211,7 +225,7 @@ function updateTotalCosts(
     const paymentDueThroughDate = terminationDate || new Date();
     const paidThroughDate = paidThroughDateDict[clientId];
     // don't want to include the date you paid through
-    const dateDif = getDateDif(paymentDueThroughDate, paidThroughDate) - 1;
+    const dateDif = getDateDifExclusive(paymentDueThroughDate, paidThroughDate);
     if (dateDif >= 1 && paidThroughDate < paymentDueThroughDate) {
       daysOwedForClientDict[clientId] = dateDif;
     }
