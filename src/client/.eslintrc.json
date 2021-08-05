@@ -1,5 +1,4 @@
 {
-  "root": true,
   "parser": "babel-eslint",
   "extends": [
     "airbnb-base",
@@ -29,7 +28,8 @@
     "camelcase": "warn",
     "import/prefer-default-export": "warn",
     "import/no-extraneous-dependencies": "warn",
-    "prefer-object-spread": "warn"
+    "prefer-object-spread": "warn",
+    "class-methods-use-this": ["error", { "exceptMethods": ["render"] }]
   },
   "settings": {
     "react": {

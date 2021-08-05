@@ -3,6 +3,25 @@ import * as publicSheetFunctions from './sheets';
 
 // Expose public functions by attaching to `global`
 global.doGet = publicUiFunctions.doGet;
+global.getTotalsAndClientData = () => {
+  const clientData = publicSheetFunctions.getClientData().slice(1);
+  const totals = {
+    totalPaid: 12340,
+    numClientsServed: 15,
+    ASAP: {
+      reimbursementsOwed: 1230,
+      daysOwed: 67,
+    },
+    ALERT: {
+      reimbursementsOwed: 230,
+      daysOwed: 23,
+    },
+  };
+  return JSON.stringify({
+    clientData,
+    totals,
+  });
+};
 // global.onOpen = publicUiFunctions.onOpen;
 // global.openDialog = publicUiFunctions.openDialog;
 // global.openDialogBootstrap = publicUiFunctions.openDialogBootstrap;

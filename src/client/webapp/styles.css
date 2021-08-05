@@ -1,3 +1,16 @@
+/* 
+  Elle's custom styles
+*/
+
+#main {
+  margin-top: 56px;
+  padding: 20px;
+}
+
+/* td {
+  max-height: 40px;
+} */
+
 /*
 CSSTransitionGroup styling
  */

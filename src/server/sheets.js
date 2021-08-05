@@ -326,6 +326,13 @@ export const onEdit = e => {
   console.timeEnd('onEdit time');
 };
 
+export const getClientData = () => {
+  // const activeSheetName = getActiveSheetName();
+  return getSheets(true)
+    [clientSheetIndex].getDataRange()
+    .getValues();
+};
+
 export const getSheetsData = () => {
   // const activeSheetName = getActiveSheetName();
   return getSheets(true).map((sheet, index) => {
