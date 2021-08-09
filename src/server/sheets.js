@@ -359,6 +359,10 @@ export const getSheetsData = () => {
     };
   });
 };
+export const getClientSheetValues = () => {
+  const clientSheet = getSheets(true)[clientSheetIndex];
+  return clientSheet.getDataRange().getValues();
+};
 
 export const getSheetValues = () => {
   // const activeSheetName = getActiveSheetName();

@@ -22,6 +22,8 @@ global.getTotalsAndClientData = () => {
     totals,
   });
 };
+// global.getTotalsAndClientData = publicUiFunctions.getTotalsAndClientData;
+
 // global.onOpen = publicUiFunctions.onOpen;
 // global.openDialog = publicUiFunctions.openDialog;
 // global.openDialogBootstrap = publicUiFunctions.openDialogBootstrap;

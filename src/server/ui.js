@@ -1,3 +1,5 @@
+import { getClientSheetValues } from './sheets';
+
 // eslint-disable-next-line import/prefer-default-export
 export const doGet = () => {
   const title = 'Silver Aye Aye';
@@ -5,6 +7,12 @@ export const doGet = () => {
   return HtmlService.createHtmlOutputFromFile(fileName)
     .setTitle(title)
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DEFAULT);
+};
+export const getTotalsAndClientData = () => {
+  console.log('getTotalsAndClientData');
+
+  const sheetValues = getClientSheetValues();
+  console.log('sheetValues', sheetValues);
 };
 
 // export const onOpen = () => {
