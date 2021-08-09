@@ -1,6 +1,8 @@
 import React from 'react';
 // import { Navbar, Container, Nav } from 'react-bootstrap';
 import PropTypes from 'prop-types';
+import OverviewCard from './OverviewCard.component';
+import CompanyOverviewCard from './CompanyOverviewCard.component';
 
 class OverviewPage extends React.Component {
   render() {
@@ -8,21 +10,30 @@ class OverviewPage extends React.Component {
       <div>
         <div>
           <h1>Overview Page</h1>
-          <p>
-            NYAN NYAN!!! Enter a name for a new sheet, hit enter and the new
-            sheet will be created. Click the red{' '}
-            <span className="text-danger">&times;</span> next to the sheet name
-            to delete it.
-          </p>
-          <ul>
+          <p>NYAN NYAN!!!!</p>
+          <div className="row">
+            <div className="col">
+              <OverviewCard
+                totalPaid={this.props.totals.totalPaid}
+                numClientsServed={this.props.totals.numClientsServed}
+              ></OverviewCard>
+              {/* <input type="text" class="form-control" placeholder="First name" aria-label="First name"> */}
+            </div>
+            <div className="col">
+              <CompanyOverviewCard></CompanyOverviewCard>
+              {/* <input type="text" class="form-control" placeholder="Last name" aria-label="Last name"> */}
+            </div>
+          </div>
+          <p>this.props.totals: {JSON.stringify(this.props.totals)}</p>
+          {/* <ul>
             {Object.keys(this.props.totals).map(key => {
               return (
-                <p key={key}>
+                <li key={key}>
                   {key}: {JSON.stringify(this.props.totals[key])}
-                </p>
+                </li>
               );
             })}
-          </ul>
+          </ul> */}
         </div>
       </div>
     );
