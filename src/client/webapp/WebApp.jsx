@@ -5,11 +5,12 @@ import NavBarSaa from './components/NavBar.saa.component';
 import OverviewPage from './pages/overview/Overview.page';
 import PaymentPage from './pages/payment/Payment.page';
 import SearchPage from './pages/search/Search.page';
+import LoadingPage from './pages/loading/Loading.page';
 
 class WebApp extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { clientData: [], totals: {}, route: '#overview' };
+    this.state = { route: '#search' };
     this.setRoute = this.setRoute.bind(this);
   }
 
@@ -36,7 +37,11 @@ class WebApp extends React.Component {
           route={this.state.route}
         ></NavBarSaa>
         <div id="main">
-          <DataLayer element={body}></DataLayer>
+          <DataLayer
+            element={body}
+            loadingPage={<LoadingPage></LoadingPage>}
+            setLoaded={this.setLoaded}
+          ></DataLayer>
         </div>
       </div>
     );

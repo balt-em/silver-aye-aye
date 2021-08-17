@@ -1,11 +1,15 @@
 import React from 'react';
-// import { Navbar, Container, Nav } from 'react-bootstrap';
+import { Spinner } from 'react-bootstrap';
 
 class LoadingPage extends React.Component {
   render() {
     return (
       <div>
-        <h1>Loading Page</h1>
+        <div className="d-flex justify-content-center">
+          <Spinner animation="border" role="status">
+            <span className="sr-only">Loading...</span>
+          </Spinner>
+        </div>
       </div>
     );
   }

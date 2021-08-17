@@ -2,7 +2,7 @@ import React from 'react';
 // import { Navbar, Container, Nav } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import OverviewCard from './OverviewCard.component';
-import CompanyOverviewCard from './CompanyOverviewCard.component';
+import CompanyOverviewCard from './CompanyOverviewCard.componet';
 
 class OverviewPage extends React.Component {
   render() {
@@ -20,8 +20,16 @@ class OverviewPage extends React.Component {
               {/* <input type="text" class="form-control" placeholder="First name" aria-label="First name"> */}
             </div>
             <div className="col">
-              <CompanyOverviewCard></CompanyOverviewCard>
-              {/* <input type="text" class="form-control" placeholder="Last name" aria-label="Last name"> */}
+              <CompanyOverviewCard
+                companyData={this.props.totals.ASAP}
+                companyName={'ASAP'}
+              ></CompanyOverviewCard>
+            </div>
+            <div className="col">
+              <CompanyOverviewCard
+                companyData={this.props.totals.ALERT}
+                companyName={'Alert'}
+              ></CompanyOverviewCard>
             </div>
           </div>
           <p>this.props.totals: {JSON.stringify(this.props.totals)}</p>

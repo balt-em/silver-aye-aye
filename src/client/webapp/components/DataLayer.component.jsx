@@ -7,7 +7,7 @@ const { serverFunctions } = server;
 class DataLayer extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { clientData: [], totals: {} };
+    this.state = { clientData: [], totals: {}, loaded: false };
     this.updateClientData = this.updateClientData.bind(this);
   }
 
@@ -27,6 +27,7 @@ class DataLayer extends React.Component {
         this.setState(() => ({
           clientData: dat.clientData,
           totals: dat.totals,
+          loaded: true,
         }));
       })
       .catch(alert);
@@ -39,6 +40,9 @@ class DataLayer extends React.Component {
   }
 
   render() {
+    if (!this.state.loaded) {
+      return this.props.loadingPage;
+    }
     return React.cloneElement(this.props.element, {
       totals: this.state.totals,
       clientData: this.state.clientData,
@@ -49,6 +53,7 @@ class DataLayer extends React.Component {
 
 DataLayer.propTypes = {
   element: PropTypes.element.isRequired,
+  loadingPage: PropTypes.element.isRequired,
 };
 
 export default DataLayer;
