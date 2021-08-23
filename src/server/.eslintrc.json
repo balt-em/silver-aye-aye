@@ -15,8 +15,9 @@
   },
   "settings": {
     "import/resolver": {
-      "node": {
-        "extensions": [".js", ".ts"]
+      "alias": {
+        "map": [["@shared", "./src/shared"]],
+        "extensions": [".js", ".jsx", ".json"]
       }
     }
   }

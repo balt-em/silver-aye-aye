@@ -36,8 +36,12 @@
       "version": "detect"
     },
     "import/resolver": {
-      "node": {
-        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+      "alias": {
+        "map": [
+          ["@shared", "./src/shared"],
+          ["@utils", "./src/client/webapp/utils"]
+        ],
+        "extensions": [".js", ".jsx", ".json"]
       }
     }
   }

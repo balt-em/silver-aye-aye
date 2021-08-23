@@ -4,7 +4,7 @@ import * as publicSheetFunctions from './sheets';
 // Expose public functions by attaching to `global`
 global.doGet = publicUiFunctions.doGet;
 global.getTotalsAndClientData = () => {
-  const clientData = publicSheetFunctions.getClientData().slice(1);
+  const clientData = publicSheetFunctions.getClientData();
   const totals = {
     totalPaid: 12340,
     numClientsServed: 15,

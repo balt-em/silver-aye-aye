@@ -96,6 +96,16 @@ const copyFilesConfig = {
 // webpack settings used by both client and server
 const sharedClientAndServerConfig = {
   context: __dirname,
+  resolve: {
+    modules: ['src', 'node_modules'],
+    extensions: ['.jsx', '.js', '.json'],
+    unsafeCache: true,
+    alias: {
+      // if updating these also update the eslint.rc in affected projects
+      '@shared': path.resolve(__dirname, 'src', 'shared'),
+      '@utils': path.resolve(__dirname, 'src', 'client', 'webapp', 'utils'),
+    },
+  },
 };
 
 // webpack settings used by all client entrypoints
@@ -108,9 +118,9 @@ const clientConfig = {
     // and should be put in .claspignore so it is not pushed
     filename: 'main.js',
   },
-  resolve: {
-    extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
-  },
+  // resolve: {
+  //   extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
+  // },
   module: {
     rules: [
       // typescript config
@@ -262,9 +272,9 @@ const serverConfig = {
     path: destination,
     libraryTarget: 'this',
   },
-  resolve: {
-    extensions: ['.ts', '.js', '.json'],
-  },
+  // resolve: {
+  //   extensions: ['.ts', '.js', '.json'],
+  // },
   module: {
     rules: [
       // typescript config

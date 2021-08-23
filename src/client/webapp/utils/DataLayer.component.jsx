@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import server from '../../utils/server';
+import server from './server';
 
 const { serverFunctions } = server;
 
@@ -31,6 +31,10 @@ class DataLayer extends React.Component {
         }));
       })
       .catch(alert);
+  }
+
+  static getReadableDate(dateString) {
+    return dateString ? new Date(dateString).toLocaleDateString() : 'N/A';
   }
 
   // eslint-disable-next-line class-methods-use-this

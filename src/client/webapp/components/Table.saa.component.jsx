@@ -16,8 +16,8 @@ class SaaTable extends React.Component {
           </tr>
         </thead>
         <tbody>
-          {rows.map(row => (
-            <tr key={row[1]}>
+          {rows.map((row, i) => (
+            <tr key={row[1]} onClick={() => this.props.clickedRow(i)}>
               {row.map((val, index) => (
                 <td key={index}>{val}</td>
               ))}
@@ -30,6 +30,7 @@ class SaaTable extends React.Component {
 }
 
 SaaTable.propTypes = {
+  clickedRow: PropTypes.func,
   editable: PropTypes.bool,
   data: PropTypes.array.isRequired,
 };

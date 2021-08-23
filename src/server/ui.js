@@ -13,6 +13,7 @@ export const getTotalsAndClientData = () => {
 
   const sheetValues = getClientSheetValues();
   console.log('sheetValues', sheetValues);
+  return sheetValues;
 };
 
 // export const onOpen = () => {

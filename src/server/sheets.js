@@ -1,6 +1,17 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-console */
 
+import {
+  CLIENT_ID_INDEX_ON_CLIENT_SHEET,
+  TOTAL_PAID_INDEX_ON_CLIENT_SHEET,
+  NUMBER_OF_DAYS_OWED_INDEX_ON_CLIENT_SHEET,
+  PAYMENT_PICKUP_DATE_INDEX_ON_CLIENT_SHEET,
+  PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET,
+  REIMBURSEMENT_OWED_INDEX_ON_CLIENT_SHEET,
+  REIMBURSEMENT_USED_INDEX_ON_CLIENT_SHEET,
+  TERMINATION_DATE_INDEX_ON_CLIENT_SHEET,
+} from '@shared/sheetconfig';
+
 const [
   intakeFormSheetIndex,
   clientSheetIndex,
@@ -26,38 +37,6 @@ const [
   reciptUrlIndexOnPaymentOverview,
   totalIndexOnPaymentOverview,
 ] = [...Array(6).keys()];
-
-const [
-  submittedOnIndexOnClientSheet,
-  clientIdIndexOnClientSheet,
-  clientsNameIndexOnClientSheet,
-  totalPaidIndexOnClientSheet,
-  numberOfDaysOwedIndexOnClientSheet,
-  paymentPickupDateIndexOnClientSheet,
-  paidThroughDateIndexOnClientSheet,
-  reimbursementOwedIndexOnClientSheet,
-  reimbursementUsedIndexOnClientSheet,
-  terminationDateIndexOnClientSheet,
-  homeDetentionCompanyIndexOnClientSheet,
-  emailIndexOnClientSheet,
-  clientsPhoneNumberIndexOnClientSheet,
-  bestWayToContactClientIndexOnClientSheet,
-  clientsDateOfBirthIndexOnClientSheet,
-  clientsNextCourtDateIndexOnClientSheet,
-  caseNumberIndexOnClientSheet,
-  attorneysNameIndexOnClientSheet,
-  isRepresentationFromPublicDefenderOfficeIndexOnClientSheet,
-  homeDetentionDompanyIndexOnClientSheet,
-  whenClientHookedUpIndexOnClientSheet,
-  whenClientWillBeHookedUpIndexOnClientSheet,
-  knownDrugIssuesIndexOnClientSheet,
-  healthIssuesIndexOnClientSheet,
-  importantClientDetailsIndexOnClientSheet,
-  infoForSomeoneFillingOutOnBehalfOfClientIndexOnClientSheet,
-  confirmedPickupIndexOnClientSheet,
-  rescheuledCourtDateIndexOnClientSheet,
-  notesIndexOnClientSheet,
-] = [...Array(29).keys()];
 // TODO we need to figure out a better way to assigned sequential numbers for our rows
 const spreadsheetUrl =
   'https://docs.google.com/spreadsheets/d/1GWh-B_IMmvNniy2p82CKQ9X-eepwx70BG50xCM5r2bo/edit#gid=0';
@@ -220,7 +199,7 @@ function updateTotalCosts(
 
   const daysOwedForClientDict = {};
   clientData.forEach(row => {
-    const clientId = row[clientIdIndexOnClientSheet];
+    const clientId = row[CLIENT_ID_INDEX_ON_CLIENT_SHEET];
     const terminationDate = clientTerminationDateDict[clientId];
     const paymentDueThroughDate = terminationDate || new Date();
     const paidThroughDate = paidThroughDateDict[clientId];
@@ -246,8 +225,8 @@ function updateTotalCosts(
     clientSheet,
     clientSheetDataRange,
     daysOwedForClientDict,
-    clientIdIndexOnClientSheet,
-    numberOfDaysOwedIndexOnClientSheet
+    CLIENT_ID_INDEX_ON_CLIENT_SHEET,
+    NUMBER_OF_DAYS_OWED_INDEX_ON_CLIENT_SHEET
   );
 
   updateColumnFromDictionary(
@@ -262,40 +241,40 @@ function updateTotalCosts(
     clientSheet,
     clientSheetDataRange,
     reimbursementUsedDict,
-    clientIdIndexOnClientSheet,
-    reimbursementUsedIndexOnClientSheet
+    CLIENT_ID_INDEX_ON_CLIENT_SHEET,
+    REIMBURSEMENT_USED_INDEX_ON_CLIENT_SHEET
   );
 
   updateColumnFromDictionary(
     clientSheet,
     clientSheetDataRange,
     clientTotalCostDict,
-    clientIdIndexOnClientSheet,
-    totalPaidIndexOnClientSheet
+    CLIENT_ID_INDEX_ON_CLIENT_SHEET,
+    TOTAL_PAID_INDEX_ON_CLIENT_SHEET
   );
 
   updateColumnFromDictionary(
     clientSheet,
     clientSheetDataRange,
     clientReimbursementOwedDict,
-    clientIdIndexOnClientSheet,
-    reimbursementOwedIndexOnClientSheet
+    CLIENT_ID_INDEX_ON_CLIENT_SHEET,
+    REIMBURSEMENT_OWED_INDEX_ON_CLIENT_SHEET
   );
 
   updateColumnFromDictionary(
     clientSheet,
     clientSheetDataRange,
     paymentPickupDateDict,
-    clientIdIndexOnClientSheet,
-    paymentPickupDateIndexOnClientSheet
+    CLIENT_ID_INDEX_ON_CLIENT_SHEET,
+    PAYMENT_PICKUP_DATE_INDEX_ON_CLIENT_SHEET
   );
 
   updateColumnFromDictionary(
     clientSheet,
     clientSheetDataRange,
     paidThroughDateDict,
-    clientIdIndexOnClientSheet,
-    paidThroughDateIndexOnClientSheet
+    CLIENT_ID_INDEX_ON_CLIENT_SHEET,
+    PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET
   );
   // daysOwedForClientDict tells us who we owe for
   // clientReimbursementOwedDict tell us who we are owed for
@@ -306,9 +285,9 @@ function updateTotalCosts(
 function getClientTerminationDateDict(clientData) {
   const clientTerminationDateDict = {};
   clientData.forEach(row => {
-    const terminationDate = row[terminationDateIndexOnClientSheet];
+    const terminationDate = row[TERMINATION_DATE_INDEX_ON_CLIENT_SHEET];
     if (terminationDate) {
-      const clientId = row[clientIdIndexOnClientSheet];
+      const clientId = row[CLIENT_ID_INDEX_ON_CLIENT_SHEET];
       clientTerminationDateDict[clientId] = new Date(terminationDate);
     }
   });
