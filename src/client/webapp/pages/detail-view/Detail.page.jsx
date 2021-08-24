@@ -4,10 +4,12 @@ import PropTypes from 'prop-types';
 import {
   CLIENT_NAME_INDEX_ON_CLIENT_SHEET,
   NOTES_INDEX_ON_CLIENT_SHEET,
+  CLIENT_ID_INDEX_ON_CLIENT_SHEET,
 } from '@shared/sheetconfig';
 import ClientOverviewData from './ClientOverviewData.component';
 import MiscellaneousClientData from './MiscellaneousClientData.component copy';
 import ClientPaymentOverview from './ClientPaymentOverview.component';
+import ClientPaymentBreakdown from './ClientPaymentBreakdown.component';
 
 class DetailPage extends React.Component {
   render() {
@@ -46,6 +48,15 @@ class DetailPage extends React.Component {
             <div className="col-3">
               <h3>Notes</h3>
               <p>{this.props.clientData[NOTES_INDEX_ON_CLIENT_SHEET]}</p>
+            </div>
+          </div>
+          <div className="row">
+            <div className="col-12">
+              <ClientPaymentBreakdown
+                clientId={
+                  this.props.clientData[CLIENT_ID_INDEX_ON_CLIENT_SHEET]
+                }
+              ></ClientPaymentBreakdown>
             </div>
           </div>
         </Modal.Body>

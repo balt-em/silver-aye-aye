@@ -3,6 +3,7 @@ import * as publicSheetFunctions from './sheets';
 
 // Expose public functions by attaching to `global`
 global.doGet = publicUiFunctions.doGet;
+global.getClientPaymentData = publicUiFunctions.getClientPaymentData;
 global.getTotalsAndClientData = () => {
   const clientData = publicSheetFunctions.getClientData();
   const totals = {

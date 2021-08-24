@@ -10,6 +10,11 @@ import {
   REIMBURSEMENT_OWED_INDEX_ON_CLIENT_SHEET,
   REIMBURSEMENT_USED_INDEX_ON_CLIENT_SHEET,
   TERMINATION_DATE_INDEX_ON_CLIENT_SHEET,
+  CLIENT_ID_INDEX_ON_PAYMENT_SHEET,
+  PAYMENT_ID_INDEX_ON_PAYMENT_SHEET,
+  START_DATE_INDEX_ON_PAYMENT_SHEET,
+  END_DATE_INDEX_ON_PAYMENT_SHEET,
+  REIMBURSEMENT_INDEX_ON_PAYMENT_SHEET,
 } from '@shared/sheetconfig';
 
 const [
@@ -18,16 +23,6 @@ const [
   paymentBreakdownSheetIndex,
   paymentOverviewSheetIndex,
 ] = [...Array(4).keys()];
-
-const [
-  clientIdIndexOnPaymentSheet,
-  paymentIdIndexOnPaymentSheet,
-  startDateIndexOnPaymentSheet,
-  endDateIndexOnPaymentSheet,
-  notesIndexOnPaymentSheet,
-  totalIndexOnPaymentSheet,
-  reimbursementIndexOnPaymentSheet,
-] = [...Array(7).keys()];
 
 const [
   paymentIdIndexOnPaymentOverview,
@@ -110,8 +105,8 @@ function updateTotalCosts(
   const paymentPickupDateDict = {};
   paymentBreakdownData.forEach(row => {
     // get the paymentBreakdown data, iterate through each row, return clientID, startDate, endDate
-    const clientId = row[clientIdIndexOnPaymentSheet];
-    const startDate = row[startDateIndexOnPaymentSheet];
+    const clientId = row[CLIENT_ID_INDEX_ON_PAYMENT_SHEET];
+    const startDate = row[START_DATE_INDEX_ON_PAYMENT_SHEET];
 
     // Get the startDate already assigned to that id in the dictionary, if there is one
     const oldPaymentPickupDate = paymentPickupDateDict[clientId];
@@ -123,15 +118,15 @@ function updateTotalCosts(
       paymentPickupDateDict[clientId] = startDate;
     }
 
-    const endDate = row[endDateIndexOnPaymentSheet];
+    const endDate = row[END_DATE_INDEX_ON_PAYMENT_SHEET];
   });
   //  get the earliest startDate
 
   const paidThroughDateDict = {};
   paymentBreakdownData.forEach(row => {
     // get the paymentBreakdown data, iterate through each row, return clientID, startDate, endDate
-    const clientId = row[clientIdIndexOnPaymentSheet];
-    const endDate = row[endDateIndexOnPaymentSheet];
+    const clientId = row[CLIENT_ID_INDEX_ON_PAYMENT_SHEET];
+    const endDate = row[END_DATE_INDEX_ON_PAYMENT_SHEET];
     const oldPaidThroughDate = paidThroughDateDict[clientId];
     // See if there was a startDate already assigned to that id in the dictionary
     if (!oldPaidThroughDate) {
@@ -150,12 +145,12 @@ function updateTotalCosts(
 
   paymentBreakdownData.forEach(row => {
     // calculate the paymentPickUpDate, paidThroughDate while looping through here
-    const clientId = row[clientIdIndexOnPaymentSheet];
+    const clientId = row[CLIENT_ID_INDEX_ON_PAYMENT_SHEET];
     const terminationDate = clientTerminationDateDict[clientId];
-    const paymentId = row[paymentIdIndexOnPaymentSheet];
-    const startDate = new Date(row[startDateIndexOnPaymentSheet]);
-    const endDate = new Date(row[endDateIndexOnPaymentSheet]);
-    const reimbursement = row[reimbursementIndexOnPaymentSheet];
+    const paymentId = row[PAYMENT_ID_INDEX_ON_PAYMENT_SHEET];
+    const startDate = new Date(row[START_DATE_INDEX_ON_PAYMENT_SHEET]);
+    const endDate = new Date(row[END_DATE_INDEX_ON_PAYMENT_SHEET]);
+    const reimbursement = row[REIMBURSEMENT_INDEX_ON_PAYMENT_SHEET];
 
     const inclusiveDateDif = getDateDifInclusive(startDate, endDate);
     const rate = paymentRateDict[paymentId];
@@ -338,9 +333,18 @@ export const getSheetsData = () => {
     };
   });
 };
+
 export const getClientSheetValues = () => {
   const clientSheet = getSheets(true)[clientSheetIndex];
   return clientSheet.getDataRange().getValues();
+};
+
+export const getPaymentSheetValues = () => {
+  const clientSheet = getSheets(true)[paymentBreakdownSheetIndex];
+  return clientSheet
+    .getDataRange()
+    .getValues()
+    .slice(1);
 };
 
 export const getSheetValues = () => {
