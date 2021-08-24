@@ -4,7 +4,7 @@ import * as indexes from '@shared/sheetconfig';
 import SaaTable from '../../components/Table.saa.component';
 import DataLayer from '../../utils/DataLayer.component';
 
-class ClientFinancialData extends React.Component {
+class ClientPaymentOverview extends React.Component {
   render() {
     const { clientData } = this.props;
 
@@ -43,14 +43,14 @@ class ClientFinancialData extends React.Component {
     ];
     return (
       <div>
-        <h2>Client Payment Data</h2>
+        <h3>Client Payment Overview</h3>
         <SaaTable data={formattedClientData}></SaaTable>
       </div>
     );
   }
 }
 
-ClientFinancialData.propTypes = {
+ClientPaymentOverview.propTypes = {
   clientData: PropTypes.array.isRequired,
 };
-export default ClientFinancialData;
+export default ClientPaymentOverview;

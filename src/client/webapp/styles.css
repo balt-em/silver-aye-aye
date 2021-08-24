@@ -11,6 +11,11 @@
   max-height: 40px;
 } */
 
+.detail-modal {
+  width: 90vw;
+  max-width: 90vw;
+}
+
 /*
 CSSTransitionGroup styling
  */

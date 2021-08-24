@@ -1,9 +1,13 @@
 import React from 'react';
 import { Modal } from 'react-bootstrap';
 import PropTypes from 'prop-types';
-import { CLIENT_NAME_INDEX_ON_CLIENT_SHEET } from '@shared/sheetconfig';
+import {
+  CLIENT_NAME_INDEX_ON_CLIENT_SHEET,
+  NOTES_INDEX_ON_CLIENT_SHEET,
+} from '@shared/sheetconfig';
 import ClientOverviewData from './ClientOverviewData.component';
-import ClientFinancialData from './ClientFinancialData.component';
+import MiscellaneousClientData from './MiscellaneousClientData.component copy';
+import ClientPaymentOverview from './ClientPaymentOverview.component';
 
 class DetailPage extends React.Component {
   render() {
@@ -11,7 +15,7 @@ class DetailPage extends React.Component {
       <Modal
         show={this.props.show}
         onHide={() => this.props.setModal(false)}
-        dialogClassName="modal-90w"
+        dialogClassName="detail-modal"
         size="lg"
         aria-labelledby="example-custom-modal-styling-title"
       >
@@ -21,12 +25,29 @@ class DetailPage extends React.Component {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <ClientOverviewData
-            clientData={this.props.clientData}
-          ></ClientOverviewData>
-          <ClientFinancialData
-            clientData={this.props.clientData}
-          ></ClientFinancialData>
+          <div className="row">
+            <div className="col-6">
+              <ClientOverviewData
+                clientData={this.props.clientData}
+              ></ClientOverviewData>
+            </div>
+            <div className="col-6">
+              <ClientPaymentOverview
+                clientData={this.props.clientData}
+              ></ClientPaymentOverview>
+            </div>
+          </div>
+          <div className="row">
+            <div className="col-9">
+              <MiscellaneousClientData
+                clientData={this.props.clientData}
+              ></MiscellaneousClientData>
+            </div>
+            <div className="col-3">
+              <h3>Notes</h3>
+              <p>{this.props.clientData[NOTES_INDEX_ON_CLIENT_SHEET]}</p>
+            </div>
+          </div>
         </Modal.Body>
       </Modal>
     );
