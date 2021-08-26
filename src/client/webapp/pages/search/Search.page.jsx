@@ -13,7 +13,7 @@ class SearchPage extends React.Component {
 
   clickedClient(index) {
     this.setState(() => ({
-      curClient: this.props.clientData[index + 1],
+      curClient: this.props.clientData[index + 1], // don't include header
       showModal: true,
     }));
   }
@@ -23,6 +23,7 @@ class SearchPage extends React.Component {
   }
 
   render() {
+    const [header, ...data] = this.props.clientData;
     return (
       <div>
         <h1>Search Page</h1>
@@ -40,7 +41,8 @@ class SearchPage extends React.Component {
         </button>
         <SaaTable
           editable={false}
-          data={this.props.clientData}
+          header={header}
+          data={data}
           clickedRow={this.clickedClient}
         ></SaaTable>
       </div>

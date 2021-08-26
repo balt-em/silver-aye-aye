@@ -23,9 +23,9 @@ export const getClientPaymentData = () => {
   sheetValues.forEach(row => {
     const index = row[indexes.CLIENT_ID_INDEX_ON_PAYMENT_SHEET];
     if (clientPaymentData[index]) {
-      clientPaymentData[index] = [row.slice(1), ...clientPaymentData[index]];
+      clientPaymentData[index] = [row, ...clientPaymentData[index]];
     } else {
-      clientPaymentData[index] = [row.slice(1)];
+      clientPaymentData[index] = [row];
     }
   });
 
