@@ -10,7 +10,6 @@ class OverviewPage extends React.Component {
       <div>
         <div>
           <h1>Overview Page</h1>
-          <p>NYAN NYAN!!!!</p>
           <div className="row">
             <div className="col">
               <OverviewCard
@@ -32,16 +31,6 @@ class OverviewPage extends React.Component {
               ></CompanyOverviewCard>
             </div>
           </div>
-          <p>this.props.totals: {JSON.stringify(this.props.totals)}</p>
-          {/* <ul>
-            {Object.keys(this.props.totals).map(key => {
-              return (
-                <li key={key}>
-                  {key}: {JSON.stringify(this.props.totals[key])}
-                </li>
-              );
-            })}
-          </ul> */}
         </div>
       </div>
     );
