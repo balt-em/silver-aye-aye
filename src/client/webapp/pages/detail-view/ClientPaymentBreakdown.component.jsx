@@ -32,7 +32,6 @@ class ClientPaymentBreakdown extends React.Component {
     return (
       <div>
         <h3>Client Payment Overview</h3>
-        {/* {JSON.stringify(paymentData)} */}
         <SaaTable
           header={ClientPaymentBreakdown.header}
           data={formattedPaymentData}

@@ -22,11 +22,11 @@ class WebApp extends React.Component {
   render() {
     let body;
     if (this.state.route === '#overview') {
-      body = <OverviewPage {...DataLayer.undefinedProps}></OverviewPage>;
+      body = <OverviewPage></OverviewPage>;
     } else if (this.state.route === '#search') {
-      body = <SearchPage {...DataLayer.undefinedProps}></SearchPage>;
+      body = <SearchPage></SearchPage>;
     } else if (this.state.route === '#payment') {
-      body = <PaymentPage {...DataLayer.undefinedProps}></PaymentPage>;
+      body = <PaymentPage></PaymentPage>;
     }
     return (
       <div>

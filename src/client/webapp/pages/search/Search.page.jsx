@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { DataLayerContext } from '@utils/DataLayer.component';
 import DetailPage from '../detail-view/Detail.page';
@@ -17,7 +16,7 @@ class SearchPage extends React.Component {
 
   clickedClient(index) {
     this.setState(() => ({
-      curClient: this.props.clientData[index + 1], // don't include header
+      curClient: this.context.clientSheetData[index], // don't include header
       showModal: true,
     }));
   }
@@ -30,7 +29,7 @@ class SearchPage extends React.Component {
     const { clientSheetData, clientSheetHeaders } = this.context;
     return (
       <div>
-        <h1>Search Page</h1>
+        <h1>Search</h1>
         {this.state.showModal ? (
           <DetailPage
             show={this.state.showModal}
@@ -50,10 +49,5 @@ class SearchPage extends React.Component {
     );
   }
 }
-
-SearchPage.propTypes = {
-  updateClientData: PropTypes.func.isRequired,
-  clientData: PropTypes.array.isRequired,
-};
 
 export default SearchPage;

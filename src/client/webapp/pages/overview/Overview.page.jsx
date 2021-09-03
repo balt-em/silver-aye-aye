@@ -38,7 +38,7 @@ class OverviewPage extends React.Component {
 }
 
 OverviewPage.propTypes = {
-  totals: PropTypes.object.isRequired,
+  totals: PropTypes.object,
 };
 
 export default OverviewPage;

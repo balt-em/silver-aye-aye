@@ -26,14 +26,6 @@ class DataLayer extends React.Component {
     this.getClientPaymentData = this.getClientPaymentData.bind(this);
   }
 
-  static undefinedProps = {
-    clientData: [],
-    totals: {},
-    updateClientData: () => {
-      console.error('updateClientData not assigned');
-    },
-  };
-
   componentDidMount() {
     serverFunctions
       .getTotalsAndClientData()
@@ -99,7 +91,6 @@ class DataLayer extends React.Component {
       <DataLayerContext.Provider value={context}>
         {React.cloneElement(this.props.element, {
           totals: this.state.totals,
-          clientData: this.state.clientData,
         })}
       </DataLayerContext.Provider>
     );
