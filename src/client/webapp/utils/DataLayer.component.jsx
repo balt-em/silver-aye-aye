@@ -6,6 +6,7 @@ const { serverFunctions } = server;
 
 export const DataLayerContext = React.createContext({
   getClientPaymentData: () => 'not implemented',
+  updateClientData: () => 'not implemented',
   clientSheetHeaders: [],
   clientSheetData: [],
 });
@@ -63,7 +64,6 @@ class DataLayer extends React.Component {
       .getClientPaymentData()
       .then(data => {
         const dat = JSON.parse(data);
-        console.log('getClientPaymentData', dat);
         this.setState(() => ({
           paymentData: dat,
         }));
@@ -78,7 +78,6 @@ class DataLayer extends React.Component {
   // eslint-disable-next-line class-methods-use-this
   updateClientData(data) {
     console.log('called updateData callback', data);
-    // this.setState({ data });
   }
 
   getClientPaymentData(clientId) {
@@ -90,9 +89,10 @@ class DataLayer extends React.Component {
       return this.props.loadingPage;
     }
     const context = {
-      getClientPaymentData: this.getClientPaymentData,
       clientSheetHeaders: this.state.clientSheetHeaders,
       clientSheetData: this.state.clientSheetData,
+      getClientPaymentData: this.getClientPaymentData,
+      updateClientData: this.updateClientData,
     };
 
     return (
@@ -100,7 +100,6 @@ class DataLayer extends React.Component {
         {React.cloneElement(this.props.element, {
           totals: this.state.totals,
           clientData: this.state.clientData,
-          updateClientData: this.updateClientData,
         })}
       </DataLayerContext.Provider>
     );

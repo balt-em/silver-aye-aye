@@ -1,6 +1,5 @@
 import React from 'react';
-// import { Navbar, Container, Nav } from 'react-bootstrap';
-import DataLayer from './utils/DataLayer.component';
+import DataLayer from '@utils/DataLayer.component';
 import NavBarSaa from './components/NavBar.saa.component';
 import OverviewPage from './pages/overview/Overview.page';
 import PaymentPage from './pages/payment/Payment.page';
@@ -21,7 +20,6 @@ class WebApp extends React.Component {
   }
 
   render() {
-    // const { totals } = this.state;
     let body;
     if (this.state.route === '#overview') {
       body = <OverviewPage {...DataLayer.undefinedProps}></OverviewPage>;
@@ -40,7 +38,6 @@ class WebApp extends React.Component {
           <DataLayer
             element={body}
             loadingPage={<LoadingPage></LoadingPage>}
-            setLoaded={this.setLoaded}
           ></DataLayer>
         </div>
       </div>
