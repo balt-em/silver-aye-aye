@@ -10,12 +10,15 @@
     "import/no-extraneous-dependencies": "warn",
     "prefer-object-spread": "warn",
     "prefer-destructuring": "warn",
-    "spaced-comment": "off"
+    "spaced-comment": "off",
+    "no-console": "warn",
+    "no-unused-vars": "warn"
   },
   "settings": {
     "import/resolver": {
-      "node": {
-        "paths": ["src"]
+      "alias": {
+        "map": [["@shared", "./src/shared"]],
+        "extensions": [".js", ".jsx", ".json"]
       }
     }
   }

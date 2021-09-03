@@ -1,10 +1,6 @@
 {
   "parser": "babel-eslint",
-  "extends": [
-    "airbnb-base",
-    "plugin:prettier/recommended",
-    "plugin:react/recommended"
-  ],
+  "extends": ["plugin:react/recommended"],
   "plugins": ["babel", "react", "prettier"],
   "env": {
     "browser": true,
@@ -23,12 +19,8 @@
     }
   },
   "rules": {
-    "prettier/prettier": "error",
-    "react/prop-types": "warn",
+    "react/prop-types": "error",
     "camelcase": "warn",
-    "import/prefer-default-export": "warn",
-    "import/no-extraneous-dependencies": "warn",
-    "prefer-object-spread": "warn",
     "class-methods-use-this": ["error", { "exceptMethods": ["render"] }]
   },
   "settings": {
