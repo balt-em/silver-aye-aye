@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import SaaTable from '../../components/Table.saa.component';
+
+import { DataLayerContext } from '@utils/DataLayer.component';
 import DetailPage from '../detail-view/Detail.page';
+import ReactTable from '../../components/ReactTable.component';
 
 class SearchPage extends React.Component {
   constructor(props) {
@@ -10,6 +12,8 @@ class SearchPage extends React.Component {
     this.clickedClient = this.clickedClient.bind(this);
     this.setModal = this.setModal.bind(this);
   }
+
+  static contextType = DataLayerContext;
 
   clickedClient(index) {
     this.setState(() => ({
@@ -23,7 +27,7 @@ class SearchPage extends React.Component {
   }
 
   render() {
-    const [header, ...data] = this.props.clientData;
+    const { clientSheetData, clientSheetHeaders } = this.context;
     return (
       <div>
         <h1>Search Page</h1>
@@ -36,15 +40,12 @@ class SearchPage extends React.Component {
         ) : (
           undefined
         )}
-        <button onClick={() => this.props.updateClientData('dat')}>
-          Update Data
-        </button>
-        <SaaTable
-          editable={false}
-          header={header}
-          data={data}
+
+        <ReactTable
+          columns={clientSheetHeaders}
+          data={clientSheetData}
           clickedRow={this.clickedClient}
-        ></SaaTable>
+        />
       </div>
     );
   }

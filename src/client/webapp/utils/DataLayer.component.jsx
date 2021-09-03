@@ -6,12 +6,21 @@ const { serverFunctions } = server;
 
 export const DataLayerContext = React.createContext({
   getClientPaymentData: () => 'not implemented',
+  clientSheetHeaders: [],
+  clientSheetData: [],
 });
 
 class DataLayer extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { clientData: [], totals: {}, loaded: false, paymentData: {} };
+    this.state = {
+      clientData: [],
+      totals: {},
+      loaded: false,
+      paymentData: {},
+      clientSheetHeaders: [],
+      clientSheetData: [],
+    };
     this.updateClientData = this.updateClientData.bind(this);
     this.getClientPaymentData = this.getClientPaymentData.bind(this);
   }
@@ -28,10 +37,24 @@ class DataLayer extends React.Component {
     serverFunctions
       .getTotalsAndClientData()
       .then(data => {
-        const dat = JSON.parse(data);
+        const { clientData, totals } = JSON.parse(data);
+        const [headers, ...rows] = clientData;
+        const clientSheetHeaders = headers.map((header, index) => {
+          return { accessor: `${index}`, Header: header };
+        });
+        const clientSheetData = rows.map(row => {
+          const rowMap = {};
+          row.forEach((field, index) => {
+            rowMap[index] = field;
+          });
+          return rowMap;
+        });
+
         this.setState(() => ({
-          clientData: dat.clientData,
-          totals: dat.totals,
+          clientSheetData,
+          clientSheetHeaders,
+          clientData, // shouldn't need to save clientData
+          totals,
           loaded: true,
         }));
       })
@@ -68,6 +91,8 @@ class DataLayer extends React.Component {
     }
     const context = {
       getClientPaymentData: this.getClientPaymentData,
+      clientSheetHeaders: this.state.clientSheetHeaders,
+      clientSheetData: this.state.clientSheetData,
     };
 
     return (
