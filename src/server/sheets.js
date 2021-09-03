@@ -1,22 +1,28 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-console */
 
+import {
+  CLIENT_ID_INDEX_ON_CLIENT_SHEET,
+  TOTAL_PAID_INDEX_ON_CLIENT_SHEET,
+  NUMBER_OF_DAYS_OWED_INDEX_ON_CLIENT_SHEET,
+  PAYMENT_PICKUP_DATE_INDEX_ON_CLIENT_SHEET,
+  PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET,
+  REIMBURSEMENT_OWED_INDEX_ON_CLIENT_SHEET,
+  REIMBURSEMENT_USED_INDEX_ON_CLIENT_SHEET,
+  TERMINATION_DATE_INDEX_ON_CLIENT_SHEET,
+  CLIENT_ID_INDEX_ON_PAYMENT_SHEET,
+  PAYMENT_ID_INDEX_ON_PAYMENT_SHEET,
+  START_DATE_INDEX_ON_PAYMENT_SHEET,
+  END_DATE_INDEX_ON_PAYMENT_SHEET,
+  REIMBURSEMENT_INDEX_ON_PAYMENT_SHEET,
+} from '@shared/sheetconfig';
+
 const [
   intakeFormSheetIndex,
   clientSheetIndex,
   paymentBreakdownSheetIndex,
   paymentOverviewSheetIndex,
 ] = [...Array(4).keys()];
-
-const [
-  clientIdIndexOnPaymentSheet,
-  paymentIdIndexOnPaymentSheet,
-  startDateIndexOnPaymentSheet,
-  endDateIndexOnPaymentSheet,
-  notesIndexOnPaymentSheet,
-  totalIndexOnPaymentSheet,
-  reimbursementIndexOnPaymentSheet,
-] = [...Array(7).keys()];
 
 const [
   paymentIdIndexOnPaymentOverview,
@@ -26,48 +32,23 @@ const [
   reciptUrlIndexOnPaymentOverview,
   totalIndexOnPaymentOverview,
 ] = [...Array(6).keys()];
-
-const [
-  submittedOnIndexOnClientSheet,
-  clientIdIndexOnClientSheet,
-  clientsNameIndexOnClientSheet,
-  totalPaidIndexOnClientSheet,
-  numberOfDaysOwedIndexOnClientSheet,
-  paymentPickupDateIndexOnClientSheet,
-  paidThroughDateIndexOnClientSheet,
-  reimbursementOwedIndexOnClientSheet,
-  reimbursementUsedIndexOnClientSheet,
-  terminationDateIndexOnClientSheet,
-  emailIndexOnClientSheet,
-  clientsPhoneNumberIndexOnClientSheet,
-  bestWayToContactClientIndexOnClientSheet,
-  clientsDateOfBirthIndexOnClientSheet,
-  clientsNextCourtDateIndexOnClientSheet,
-  caseNumberIndexOnClientSheet,
-  attorneysNameIndexOnClientSheet,
-  isRepresentationFromPublicDefenderOfficeIndexOnClientSheet,
-  homeDetentionDompanyIndexOnClientSheet,
-  whenClientHookedUpIndexOnClientSheet,
-  whenClientWillBeHookedUpIndexOnClientSheet,
-  knownDrugIssuesIndexOnClientSheet,
-  healthIssuesIndexOnClientSheet,
-  importantClientDetailsIndexOnClientSheet,
-  infoForSomeoneFillingOutOnBehalfOfClientIndexOnClientSheet,
-  confirmedPickupIndexOnClientSheet,
-  rescheuledCourtDateIndexOnClientSheet,
-  notesIndexOnClientSheet,
-] = [...Array(27).keys()];
 // TODO we need to figure out a better way to assigned sequential numbers for our rows
 const spreadsheetUrl =
   'https://docs.google.com/spreadsheets/d/1GWh-B_IMmvNniy2p82CKQ9X-eepwx70BG50xCM5r2bo/edit#gid=0';
 
 // https://stackoverflow.com/questions/2627473/how-to-calculate-the-number-of-days-between-two-dates
-function getDateDif(date1, date2) {
+// the difference between two dates including the start OR the end date: 1/1 - 1/1 is 0 days
+function getDateDifExclusive(date1, date2) {
   const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
   const firstDate = date1;
   const secondDate = date2;
 
-  return Math.floor(Math.abs((firstDate - secondDate) / oneDay)) + 1;
+  return Math.floor(Math.abs((firstDate - secondDate) / oneDay));
+}
+
+// the difference between two dates including the start and end date:  1/1 - 1/1 is 1 day
+function getDateDifInclusive(date1, date2) {
+  return getDateDifExclusive(date1, date2) + 1;
 }
 
 // take a boolean 'useUrl', you have to use a URL if calling from the UI, and can't use one if the
@@ -124,8 +105,8 @@ function updateTotalCosts(
   const paymentPickupDateDict = {};
   paymentBreakdownData.forEach(row => {
     // get the paymentBreakdown data, iterate through each row, return clientID, startDate, endDate
-    const clientId = row[clientIdIndexOnPaymentSheet];
-    const startDate = row[startDateIndexOnPaymentSheet];
+    const clientId = row[CLIENT_ID_INDEX_ON_PAYMENT_SHEET];
+    const startDate = row[START_DATE_INDEX_ON_PAYMENT_SHEET];
 
     // Get the startDate already assigned to that id in the dictionary, if there is one
     const oldPaymentPickupDate = paymentPickupDateDict[clientId];
@@ -137,15 +118,15 @@ function updateTotalCosts(
       paymentPickupDateDict[clientId] = startDate;
     }
 
-    const endDate = row[endDateIndexOnPaymentSheet];
+    const endDate = row[END_DATE_INDEX_ON_PAYMENT_SHEET];
   });
   //  get the earliest startDate
 
   const paidThroughDateDict = {};
   paymentBreakdownData.forEach(row => {
     // get the paymentBreakdown data, iterate through each row, return clientID, startDate, endDate
-    const clientId = row[clientIdIndexOnPaymentSheet];
-    const endDate = row[endDateIndexOnPaymentSheet];
+    const clientId = row[CLIENT_ID_INDEX_ON_PAYMENT_SHEET];
+    const endDate = row[END_DATE_INDEX_ON_PAYMENT_SHEET];
     const oldPaidThroughDate = paidThroughDateDict[clientId];
     // See if there was a startDate already assigned to that id in the dictionary
     if (!oldPaidThroughDate) {
@@ -164,22 +145,17 @@ function updateTotalCosts(
 
   paymentBreakdownData.forEach(row => {
     // calculate the paymentPickUpDate, paidThroughDate while looping through here
-    const clientId = row[clientIdIndexOnPaymentSheet];
+    const clientId = row[CLIENT_ID_INDEX_ON_PAYMENT_SHEET];
     const terminationDate = clientTerminationDateDict[clientId];
-    const paymentId = row[paymentIdIndexOnPaymentSheet];
-    const startDate = new Date(row[startDateIndexOnPaymentSheet]);
-    const endDate = new Date(row[endDateIndexOnPaymentSheet]);
-    const reimbursement = row[reimbursementIndexOnPaymentSheet];
+    const paymentId = row[PAYMENT_ID_INDEX_ON_PAYMENT_SHEET];
+    const startDate = new Date(row[START_DATE_INDEX_ON_PAYMENT_SHEET]);
+    const endDate = new Date(row[END_DATE_INDEX_ON_PAYMENT_SHEET]);
+    const reimbursement = row[REIMBURSEMENT_INDEX_ON_PAYMENT_SHEET];
 
-    const dateDif = getDateDif(startDate, endDate);
+    const inclusiveDateDif = getDateDifInclusive(startDate, endDate);
     const rate = paymentRateDict[paymentId];
 
-    if (terminationDate && terminationDate < endDate) {
-      const daysOverpaid = getDateDif(terminationDate, endDate);
-      clientReimbursementOwedDict[clientId] = daysOverpaid * rate;
-    }
-
-    let cost = dateDif * rate;
+    let cost = inclusiveDateDif * rate;
     if (reimbursement === 'y') {
       cost = -cost;
       reimbursementUsedDict[clientId] = cost;
@@ -201,16 +177,29 @@ function updateTotalCosts(
     } else {
       clientTotalCostDict[clientId] = cost;
     }
+
+    if (reimbursement === 'n' && terminationDate && terminationDate < endDate) {
+      let amountToReimburse = cost;
+      if (startDate < terminationDate) {
+        const daysOverpaid = getDateDifExclusive(terminationDate, endDate);
+        amountToReimburse = daysOverpaid * rate;
+      }
+      if (clientReimbursementOwedDict[clientId]) {
+        clientReimbursementOwedDict[clientId] += amountToReimburse;
+      } else {
+        clientReimbursementOwedDict[clientId] = amountToReimburse;
+      }
+    }
   });
 
   const daysOwedForClientDict = {};
   clientData.forEach(row => {
-    const clientId = row[clientIdIndexOnClientSheet];
+    const clientId = row[CLIENT_ID_INDEX_ON_CLIENT_SHEET];
     const terminationDate = clientTerminationDateDict[clientId];
     const paymentDueThroughDate = terminationDate || new Date();
     const paidThroughDate = paidThroughDateDict[clientId];
     // don't want to include the date you paid through
-    const dateDif = getDateDif(paymentDueThroughDate, paidThroughDate) - 1;
+    const dateDif = getDateDifExclusive(paymentDueThroughDate, paidThroughDate);
     if (dateDif >= 1 && paidThroughDate < paymentDueThroughDate) {
       daysOwedForClientDict[clientId] = dateDif;
     }
@@ -231,8 +220,8 @@ function updateTotalCosts(
     clientSheet,
     clientSheetDataRange,
     daysOwedForClientDict,
-    clientIdIndexOnClientSheet,
-    numberOfDaysOwedIndexOnClientSheet
+    CLIENT_ID_INDEX_ON_CLIENT_SHEET,
+    NUMBER_OF_DAYS_OWED_INDEX_ON_CLIENT_SHEET
   );
 
   updateColumnFromDictionary(
@@ -247,40 +236,40 @@ function updateTotalCosts(
     clientSheet,
     clientSheetDataRange,
     reimbursementUsedDict,
-    clientIdIndexOnClientSheet,
-    reimbursementUsedIndexOnClientSheet
+    CLIENT_ID_INDEX_ON_CLIENT_SHEET,
+    REIMBURSEMENT_USED_INDEX_ON_CLIENT_SHEET
   );
 
   updateColumnFromDictionary(
     clientSheet,
     clientSheetDataRange,
     clientTotalCostDict,
-    clientIdIndexOnClientSheet,
-    totalPaidIndexOnClientSheet
+    CLIENT_ID_INDEX_ON_CLIENT_SHEET,
+    TOTAL_PAID_INDEX_ON_CLIENT_SHEET
   );
 
   updateColumnFromDictionary(
     clientSheet,
     clientSheetDataRange,
     clientReimbursementOwedDict,
-    clientIdIndexOnClientSheet,
-    reimbursementOwedIndexOnClientSheet
+    CLIENT_ID_INDEX_ON_CLIENT_SHEET,
+    REIMBURSEMENT_OWED_INDEX_ON_CLIENT_SHEET
   );
 
   updateColumnFromDictionary(
     clientSheet,
     clientSheetDataRange,
     paymentPickupDateDict,
-    clientIdIndexOnClientSheet,
-    paymentPickupDateIndexOnClientSheet
+    CLIENT_ID_INDEX_ON_CLIENT_SHEET,
+    PAYMENT_PICKUP_DATE_INDEX_ON_CLIENT_SHEET
   );
 
   updateColumnFromDictionary(
     clientSheet,
     clientSheetDataRange,
     paidThroughDateDict,
-    clientIdIndexOnClientSheet,
-    paidThroughDateIndexOnClientSheet
+    CLIENT_ID_INDEX_ON_CLIENT_SHEET,
+    PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET
   );
   // daysOwedForClientDict tells us who we owe for
   // clientReimbursementOwedDict tell us who we are owed for
@@ -291,9 +280,9 @@ function updateTotalCosts(
 function getClientTerminationDateDict(clientData) {
   const clientTerminationDateDict = {};
   clientData.forEach(row => {
-    const terminationDate = row[terminationDateIndexOnClientSheet];
+    const terminationDate = row[TERMINATION_DATE_INDEX_ON_CLIENT_SHEET];
     if (terminationDate) {
-      const clientId = row[clientIdIndexOnClientSheet];
+      const clientId = row[CLIENT_ID_INDEX_ON_CLIENT_SHEET];
       clientTerminationDateDict[clientId] = new Date(terminationDate);
     }
   });
@@ -326,6 +315,13 @@ export const onEdit = e => {
   console.timeEnd('onEdit time');
 };
 
+export const getClientData = () => {
+  // const activeSheetName = getActiveSheetName();
+  return getSheets(true)
+    [clientSheetIndex].getDataRange()
+    .getValues();
+};
+
 export const getSheetsData = () => {
   // const activeSheetName = getActiveSheetName();
   return getSheets(true).map((sheet, index) => {
@@ -336,6 +332,19 @@ export const getSheetsData = () => {
       // isActive: name === activeSheetName,
     };
   });
+};
+
+export const getClientSheetValues = () => {
+  const clientSheet = getSheets(true)[clientSheetIndex];
+  return clientSheet.getDataRange().getValues();
+};
+
+export const getPaymentSheetValues = () => {
+  const clientSheet = getSheets(true)[paymentBreakdownSheetIndex];
+  return clientSheet
+    .getDataRange()
+    .getValues()
+    .slice(1);
 };
 
 export const getSheetValues = () => {
