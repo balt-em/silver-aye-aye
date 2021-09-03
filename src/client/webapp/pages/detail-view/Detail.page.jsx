@@ -7,7 +7,7 @@ import {
   CLIENT_ID_INDEX_ON_CLIENT_SHEET,
 } from '@shared/sheetconfig';
 import ClientOverviewData from './ClientOverviewData.component';
-import MiscellaneousClientData from './MiscellaneousClientData.component copy';
+import MiscellaneousClientData from './MiscellaneousClientData.component';
 import ClientPaymentOverview from './ClientPaymentOverview.component';
 import ClientPaymentBreakdown from './ClientPaymentBreakdown.component';
 

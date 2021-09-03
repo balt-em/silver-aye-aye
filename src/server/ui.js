@@ -10,8 +10,6 @@ export const doGet = () => {
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DEFAULT);
 };
 export const getTotalsAndClientData = () => {
-  console.log('getTotalsAndClientData');
-
   const sheetValues = getClientSheetValues();
   console.log('sheetValues', sheetValues);
   return sheetValues;
@@ -40,20 +38,6 @@ export const getClientPaymentData = () => {
 //     .addItem('About me', 'openAboutSidebar');
 
 //   menu.addToUi();
-// };
-
-// export const openDialog = () => {
-//   const html = HtmlService.createHtmlOutputFromFile('dialog-demo')
-//     .setWidth(600)
-//     .setHeight(600);
-//   SpreadsheetApp.getUi().showModalDialog(html, 'Sheet Editor');
-// };
-
-// export const openDialogBootstrap = () => {
-//   const html = HtmlService.createHtmlOutputFromFile('dialog-demo-bootstrap')
-//     .setWidth(600)
-//     .setHeight(600);
-//   SpreadsheetApp.getUi().showModalDialog(html, 'Sheet Editor (Bootstrap)');
 // };
 
 // export const openAboutSidebar = () => {
