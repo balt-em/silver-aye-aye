@@ -31,6 +31,3 @@ global.migrateData = publicMigrationFunctions.migrateData;
 
 global.onEdit = publicSheetFunctions.onEdit;
 global.getSheetsData = publicSheetFunctions.getSheetsData;
-global.addSheet = publicSheetFunctions.addSheet;
-global.deleteSheet = publicSheetFunctions.deleteSheet;
-global.setActiveSheet = publicSheetFunctions.setActiveSheet;

@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { DataLayerContext } from '@utils/DataLayer.component';
+import * as indexes from '@shared/sheetconfig';
 import DetailPage from '../detail-view/Detail.page';
 import ReactTable from '../../components/ReactTable.component';
 
@@ -14,9 +15,12 @@ class SearchPage extends React.Component {
 
   static contextType = DataLayerContext;
 
-  clickedClient(index) {
+  clickedClient(id) {
+    const client = this.context.clientSheetData.filter(
+      row => row[indexes.CLIENT_ID_INDEX_ON_CLIENT_SHEET] === id
+    )[0];
     this.setState(() => ({
-      curClient: this.context.clientSheetData[index], // don't include header
+      curClient: client, // don't include header
       showModal: true,
     }));
   }
