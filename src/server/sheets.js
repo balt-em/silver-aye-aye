@@ -17,11 +17,11 @@ import {
   REIMBURSEMENT_INDEX_ON_PAYMENT_SHEET,
 } from '@shared/sheetconfig';
 
-const [
-  intakeFormSheetIndex,
-  clientSheetIndex,
-  paymentBreakdownSheetIndex,
-  paymentOverviewSheetIndex,
+export const [
+  INTAKE_FORM_SHEET_INDEX,
+  CLIENT_SHEET_INDEX,
+  PAYMENT_BREAKDOWN_SHEET_INDEX,
+  PAYMENT_OVERVIEW_SHEET_INDEX,
 ] = [...Array(4).keys()];
 
 const [
@@ -34,7 +34,8 @@ const [
 ] = [...Array(6).keys()];
 // TODO we need to figure out a better way to assigned sequential numbers for our rows
 const spreadsheetUrl =
-  'https://docs.google.com/spreadsheets/d/1GWh-B_IMmvNniy2p82CKQ9X-eepwx70BG50xCM5r2bo/edit#gid=0';
+  'https://docs.google.com/spreadsheets/d/1wyPjcdA8DVUeCbyYCanyOaBxcv_YlJK8WIrPnQ0JeOk/edit#gid=518849693';
+// 'https://docs.google.com/spreadsheets/d/1GWh-B_IMmvNniy2p82CKQ9X-eepwx70BG50xCM5r2bo/edit#gid=1404273585';
 
 // https://stackoverflow.com/questions/2627473/how-to-calculate-the-number-of-days-between-two-dates
 // the difference between two dates including the start OR the end date: 1/1 - 1/1 is 0 days
@@ -53,7 +54,7 @@ function getDateDifInclusive(date1, date2) {
 
 // take a boolean 'useUrl', you have to use a URL if calling from the UI, and can't use one if the
 // script being run is directly attached to a google sheet (aka onEdit)
-function getSheets(useUrl) {
+export function getSheets(useUrl) {
   if (useUrl) {
     return SpreadsheetApp.openByUrl(spreadsheetUrl).getSheets();
   }
@@ -205,14 +206,15 @@ function updateTotalCosts(
     }
   });
 
-  const clientSheet = sheets[clientSheetIndex];
+  const clientSheet = sheets[CLIENT_SHEET_INDEX];
   const clientSheetDataRange = clientSheet
     .getDataRange()
     .getValues()
     .slice(1);
-  const paymentOverviewSheet = sheets[paymentOverviewSheetIndex];
-  const paymentOverviewSheetDataRange = sheets[paymentOverviewSheetIndex]
-    .getDataRange()
+  const paymentOverviewSheet = sheets[PAYMENT_OVERVIEW_SHEET_INDEX];
+  const paymentOverviewSheetDataRange = sheets[
+    PAYMENT_OVERVIEW_SHEET_INDEX
+  ].getDataRange()
     .getValues()
     .slice(1);
 
@@ -299,9 +301,9 @@ export const onEdit = e => {
       .getValues()
       .slice(1)
   );
-  const clientData = sheetValues[clientSheetIndex];
-  const paymentBreakdownData = sheetValues[paymentBreakdownSheetIndex];
-  const paymentOverviewData = sheetValues[paymentOverviewSheetIndex];
+  const clientData = sheetValues[CLIENT_SHEET_INDEX];
+  const paymentBreakdownData = sheetValues[PAYMENT_BREAKDOWN_SHEET_INDEX];
+  const paymentOverviewData = sheetValues[PAYMENT_OVERVIEW_SHEET_INDEX];
 
   const clientTerminationDateDict = getClientTerminationDateDict(clientData);
 
@@ -318,7 +320,7 @@ export const onEdit = e => {
 export const getClientData = () => {
   // const activeSheetName = getActiveSheetName();
   return getSheets(true)
-    [clientSheetIndex].getDataRange()
+    [CLIENT_SHEET_INDEX].getDataRange()
     .getValues();
 };
 
@@ -335,45 +337,36 @@ export const getSheetsData = () => {
 };
 
 export const getClientSheetValues = () => {
-  const clientSheet = getSheets(true)[clientSheetIndex];
+  const clientSheet = getSheets(true)[CLIENT_SHEET_INDEX];
   return clientSheet.getDataRange().getValues();
 };
 
-export const getPaymentSheetValues = () => {
-  const clientSheet = getSheets(true)[paymentBreakdownSheetIndex];
-  return clientSheet
+export const getSheet = (index, useUrl) => {
+  return getSheets(useUrl)[index];
+};
+
+export const getSheetValues = sheet => {
+  return sheet
     .getDataRange()
     .getValues()
     .slice(1);
 };
 
-export const getSheetValues = () => {
-  // const activeSheetName = getActiveSheetName();
-  return getSheets().map(sheet => {
-    const name = sheet.getName();
-    console.log('sheet.getDataRange()', sheet.getDataRange());
-    return {
-      name,
-      data: sheet.getDataRange(),
-      values: sheet.getDataRange().getValues(),
-    };
-  });
+export const setSheetValues = (sheet, formattedData) => {
+  const dataRange = sheet.getRange(
+    2,
+    1,
+    formattedData.length,
+    formattedData[0].length
+  );
+
+  dataRange.setValues(formattedData);
 };
 
-export const addSheet = sheetTitle => {
-  SpreadsheetApp.getActive().insertSheet(sheetTitle);
-  return getSheetsData();
-};
-
-export const deleteSheet = sheetIndex => {
-  const sheets = getSheets();
-  SpreadsheetApp.getActive().deleteSheet(sheets[sheetIndex]);
-  return getSheetsData();
-};
-
-export const setActiveSheet = sheetName => {
-  SpreadsheetApp.getActive()
-    .getSheetByName(sheetName)
-    .activate();
-  return getSheetsData();
+export const getPaymentSheetValues = () => {
+  const clientSheet = getSheets(true)[PAYMENT_BREAKDOWN_SHEET_INDEX];
+  return clientSheet
+    .getDataRange()
+    .getValues()
+    .slice(1);
 };

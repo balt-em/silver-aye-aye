@@ -1,5 +1,6 @@
 import * as publicUiFunctions from './ui';
 import * as publicSheetFunctions from './sheets';
+import * as publicMigrationFunctions from './data-migration';
 
 // Expose public functions by attaching to `global`
 global.doGet = publicUiFunctions.doGet;
@@ -25,13 +26,11 @@ global.getTotalsAndClientData = () => {
 };
 // global.getTotalsAndClientData = publicUiFunctions.getTotalsAndClientData;
 
-// global.onOpen = publicUiFunctions.onOpen;
-// global.openDialog = publicUiFunctions.openDialog;
-// global.openDialogBootstrap = publicUiFunctions.openDialogBootstrap;
-// global.openAboutSidebar = publicUiFunctions.openAboutSidebar;
+global.onOpen = publicMigrationFunctions.onOpen;
+global.migrateData = publicMigrationFunctions.migrateData;
+
 global.onEdit = publicSheetFunctions.onEdit;
 global.getSheetsData = publicSheetFunctions.getSheetsData;
-global.getSheetValues = publicSheetFunctions.getSheetValues;
 global.addSheet = publicSheetFunctions.addSheet;
 global.deleteSheet = publicSheetFunctions.deleteSheet;
 global.setActiveSheet = publicSheetFunctions.setActiveSheet;
