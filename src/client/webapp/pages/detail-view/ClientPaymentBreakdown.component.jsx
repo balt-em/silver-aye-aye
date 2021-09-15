@@ -16,6 +16,13 @@ class ClientPaymentBreakdown extends React.Component {
 
   render() {
     const paymentData = this.context.getClientPaymentData(this.props.clientId);
+    if (!paymentData) {
+      return (
+        <div>
+          <h3>No Payments For Client</h3>
+        </div>
+      );
+    }
     const formattedPaymentData = paymentData.map(row => {
       const reimbursement = row[indexes.REIMBURSEMENT_INDEX_ON_PAYMENT_SHEET]; // 'y' or 'n'
       const legibleReimbursement =

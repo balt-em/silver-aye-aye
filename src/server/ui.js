@@ -1,5 +1,11 @@
 import * as indexes from '@shared/sheetconfig';
-import { getClientSheetValues, getPaymentSheetValues } from './sheets';
+import {
+  TOTAL_PAID_INDEX_ON_CLIENT_SHEET,
+  HOME_DETENTION_COMPANY_INDEX_ON_CLIENT_SHEET,
+  REIMBURSEMENT_OWED_INDEX_ON_CLIENT_SHEET,
+  NUMBER_OF_DAYS_OWED_INDEX_ON_CLIENT_SHEET,
+} from '@shared/sheetconfig';
+import { getClientSheet, getPaymentSheetValues } from './sheets';
 
 // eslint-disable-next-line import/prefer-default-export
 export const doGet = () => {
@@ -9,10 +15,63 @@ export const doGet = () => {
     .setTitle(title)
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DEFAULT);
 };
+
 export const getTotalsAndClientData = () => {
-  const sheetValues = getClientSheetValues();
-  console.log('sheetValues', sheetValues);
-  return sheetValues;
+  const clientSheet = getClientSheet();
+  const clientData = clientSheet.slice(1);
+  let numClientsServed = 0;
+  let totalPaid = 0;
+  const companyData = {
+    ASAP: {
+      reimbursementsOwed: 0,
+      daysOwed: 0,
+    },
+    ALERT: {
+      reimbursementsOwed: 0,
+      daysOwed: 0,
+    },
+    Other: {
+      reimbursementsOwed: 0,
+      daysOwed: 0,
+    },
+  };
+  clientData.forEach(client => {
+    const amountPaid = client[TOTAL_PAID_INDEX_ON_CLIENT_SHEET];
+    if (amountPaid && amountPaid > 0) {
+      numClientsServed += 1;
+    }
+    if (amountPaid) {
+      totalPaid += amountPaid;
+    }
+
+    let clientCompany = client[HOME_DETENTION_COMPANY_INDEX_ON_CLIENT_SHEET];
+
+    if (clientCompany !== 'ASAP' && clientCompany !== 'ALERT') {
+      clientCompany = 'Other';
+    }
+    const clientReimbursementOwed =
+      client[REIMBURSEMENT_OWED_INDEX_ON_CLIENT_SHEET];
+    const clientDaysOwed = client[NUMBER_OF_DAYS_OWED_INDEX_ON_CLIENT_SHEET];
+
+    if (clientReimbursementOwed) {
+      companyData[clientCompany].reimbursementsOwed += clientReimbursementOwed;
+    }
+    if (clientDaysOwed) {
+      companyData[clientCompany].daysOwed += clientDaysOwed;
+    }
+  });
+
+  const totals = {
+    totalPaid,
+    numClientsServed,
+    ASAP: companyData.ASAP,
+    ALERT: companyData.ALERT,
+  };
+
+  return JSON.stringify({
+    clientData: clientSheet,
+    totals,
+  });
 };
 
 export const getClientPaymentData = () => {
