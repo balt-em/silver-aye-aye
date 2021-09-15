@@ -52,13 +52,18 @@ export const onOpen = () => {
   menu.addToUi();
 };
 
-const formatIndividualClientData = (uuid, clientData) => {
+const formatIndividualClientData = (uuid, clientData, matchingAsapRow) => {
   const [submittedOn, clientName, ...remainingIntakeData] = clientData; // <--- SEE ABOVE COMMENT
+  const terminated =
+    matchingAsapRow[STILL_PAYING_INDEX_ON_BALT_PAYMENT_SHEET] === 'No'
+      ? ''
+      : matchingAsapRow[STILL_PAYING_INDEX_ON_BALT_PAYMENT_SHEET];
   return [
     uuid,
     submittedOn,
     clientName,
-    ...Array(7), // leave blank space for calculated columns and termination date
+    ...Array(6), // leave blank space for calculated columns and termination date
+    terminated,
     ...remainingIntakeData,
   ];
 };
@@ -128,7 +133,7 @@ const groupPaymentData = paymentData => {
 
 const matchClientDataWithPaymentData = (intakeFormValues, asapSheetValues) => {
   const matchedValues = [];
-  const asapMap = {};
+  const asapMap = {}; // client Name: last row in ASAP table for that name, sans duplicates
   asapSheetValues.forEach(row => {
     const name = row[NAME_INDEX_ON_BALT_PAYMENT_SHEET];
     if (row[STILL_PAYING_INDEX_ON_BALT_PAYMENT_SHEET] !== 'Duplicate Request') {
@@ -138,15 +143,26 @@ const matchClientDataWithPaymentData = (intakeFormValues, asapSheetValues) => {
   const paymentData = []; // {clientId, startDate, endDate, rate, datePaid, paidBy, Notes}
   const formattedIntakeFormData = [];
 
-  intakeFormValues.forEach(intakeFormRow => {
+  // remove duplicates
+  const seenNameMap = {};
+  const filteredIntakeFormValues = intakeFormValues.filter(intakeFormRow => {
+    const clientName = intakeFormRow[CLIENT_NAME_INDEX_ON_INTAKE_FORM];
+    if (!seenNameMap[clientName]) {
+      seenNameMap[clientName] = true;
+      return true;
+    }
+    return false;
+  });
+
+  filteredIntakeFormValues.forEach(intakeFormRow => {
     const matchingAsapRow =
       asapMap[intakeFormRow[CLIENT_NAME_INDEX_ON_INTAKE_FORM]];
     if (matchingAsapRow) {
-      // if none, it's a duplicate so we won't use it
+      // if none, it's not in the ASAP table or is a duplicate so we won't use it
 
       const clientId = uuidv4();
       formattedIntakeFormData.push(
-        formatIndividualClientData(clientId, intakeFormRow)
+        formatIndividualClientData(clientId, intakeFormRow, matchingAsapRow)
       );
 
       const paymentsForClient = matchingAsapRow.slice(
