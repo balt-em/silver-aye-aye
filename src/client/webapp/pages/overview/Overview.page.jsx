@@ -1,11 +1,16 @@
 import React from 'react';
 // import { Navbar, Container, Nav } from 'react-bootstrap';
 import PropTypes from 'prop-types';
+import { DataLayerContext } from '@utils/DataLayer.component';
 import OverviewCard from './OverviewCard.component';
 import CompanyOverviewCard from './CompanyOverviewCard.componet';
 
 class OverviewPage extends React.Component {
+  static contextType = DataLayerContext;
+
   render() {
+    const { totals } = this.context;
+
     return (
       <div>
         <div>
@@ -13,20 +18,20 @@ class OverviewPage extends React.Component {
           <div className="row">
             <div className="col">
               <OverviewCard
-                totalPaid={this.props.totals.totalPaid}
-                numClientsServed={this.props.totals.numClientsServed}
+                totalPaid={totals.totalPaid}
+                numClientsServed={totals.numClientsServed}
               ></OverviewCard>
               {/* <input type="text" class="form-control" placeholder="First name" aria-label="First name"> */}
             </div>
             <div className="col">
               <CompanyOverviewCard
-                companyData={this.props.totals.ASAP}
+                companyData={totals.ASAP}
                 companyName={'ASAP'}
               ></CompanyOverviewCard>
             </div>
             <div className="col">
               <CompanyOverviewCard
-                companyData={this.props.totals.ALERT}
+                companyData={totals.ALERT}
                 companyName={'Alert'}
               ></CompanyOverviewCard>
             </div>

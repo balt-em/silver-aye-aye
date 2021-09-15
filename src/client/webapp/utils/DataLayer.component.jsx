@@ -7,6 +7,7 @@ const { serverFunctions } = server;
 export const DataLayerContext = React.createContext({
   getClientPaymentData: () => 'not implemented',
   updateClientData: () => 'not implemented',
+  totals: {},
   clientSheetHeaders: [],
   clientSheetData: [],
 });
@@ -42,6 +43,7 @@ class DataLayer extends React.Component {
           });
           return rowMap;
         });
+        console.log('totals', totals);
 
         this.setState(() => ({
           clientSheetData,
@@ -83,15 +85,14 @@ class DataLayer extends React.Component {
     const context = {
       clientSheetHeaders: this.state.clientSheetHeaders,
       clientSheetData: this.state.clientSheetData,
+      totals: this.state.totals,
       getClientPaymentData: this.getClientPaymentData,
       updateClientData: this.updateClientData,
     };
 
     return (
       <DataLayerContext.Provider value={context}>
-        {React.cloneElement(this.props.element, {
-          totals: this.state.totals,
-        })}
+        {this.props.element}
       </DataLayerContext.Provider>
     );
   }
