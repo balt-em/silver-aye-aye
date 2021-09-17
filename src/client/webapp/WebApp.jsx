@@ -9,7 +9,7 @@ import LoadingPage from './pages/loading/Loading.page';
 class WebApp extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { route: '#search' };
+    this.state = { route: '#payment' };
     this.setRoute = this.setRoute.bind(this);
   }
 

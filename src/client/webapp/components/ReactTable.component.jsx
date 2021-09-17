@@ -44,7 +44,7 @@ GlobalFilter.propTypes = {
 };
 
 function ReactTable(props) {
-  const data = React.useMemo(() => props.data, []);
+  const data = React.useMemo(() => props.data, [props.data.length]);
 
   const columns = React.useMemo(() => props.columns, []);
 
@@ -59,10 +59,11 @@ function ReactTable(props) {
     setGlobalFilter,
   } = useTable({ columns, data }, useGlobalFilter, useSortBy);
 
-  const firstPageRows = rows.slice(0, 50);
+  const firstPageRows = rows.slice(0, props.maxDisplay);
 
   return (
     <div>
+      {props.data.length}
       <GlobalFilter
         preGlobalFilteredRows={preGlobalFilteredRows}
         globalFilter={state.globalFilter}
@@ -134,6 +135,7 @@ ReactTable.propTypes = {
   clickedRow: PropTypes.func,
   columns: PropTypes.array,
   data: PropTypes.array,
+  maxDisplay: PropTypes.number,
 };
 
 export default ReactTable;

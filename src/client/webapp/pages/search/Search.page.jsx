@@ -48,6 +48,7 @@ class SearchPage extends React.Component {
           columns={clientSheetHeaders}
           data={clientSheetData}
           clickedRow={this.clickedClient}
+          maxDisplay={100}
         />
       </div>
     );

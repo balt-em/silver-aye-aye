@@ -43,7 +43,6 @@ class DataLayer extends React.Component {
           });
           return rowMap;
         });
-        console.log('totals', totals);
 
         this.setState(() => ({
           clientSheetData,
