@@ -24,14 +24,14 @@ class CollapsableCard extends React.Component {
           <Card.Title>
             {this.props.title}
             <button
-              style={{ float: 'right' }}
+              style={{ float: 'right', width: '10rem' }}
               className="btn btn-primary"
               type="button"
               aria-expanded={display.toString()}
               aria-controls={id}
               onClick={this.toggle}
             >
-              {this.state.display ? 'Hide' : 'Show'}
+              {this.state.display ? 'Collapse' : 'Show'}
             </button>
           </Card.Title>
           {display && <div id={id}>{this.props.children}</div>}

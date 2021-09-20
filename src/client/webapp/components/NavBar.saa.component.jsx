@@ -29,7 +29,7 @@ class NavBarSaa extends React.Component {
                 onClick={() => this.props.setRoute('#payment')}
                 className={this.props.route === '#payment' ? 'active' : ''}
               >
-                Make a Payment
+                Add Payment Record
               </Nav.Link>
             </Nav>
           </Navbar.Collapse>
