@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import React from 'react';
 import { DataLayerContext } from '@utils/DataLayer.component';
 import {
@@ -22,7 +23,25 @@ class PaymentRecordTable extends React.Component {
 
   // TODO: REMOVE or rework
   static formatClientData(clientData) {
-    console.log('clientData', clientData);
+    clientData.forEach(client => {
+      console.log(
+        'client',
+        client,
+        PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET,
+        client[PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET]
+      );
+      const paidThroughDate = client[PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET];
+      const terminationDate = client[TERMINATION_DATE_INDEX_ON_CLIENT_SHEET];
+
+      const startDate = new Date();
+      startDate.setDate(paidThroughDate.getDate() + 1);
+
+      const endDate = terminationDate || new Date();
+
+      client.startDate = startDate;
+      client.endDate = startDate > endDate ? undefined : endDate;
+      client.terminationDate = terminationDate;
+    });
     return clientData;
   }
 
@@ -54,10 +73,16 @@ class PaymentRecordTable extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.clientSheetData.length !== prevProps.clientSheetData.length)
+    if (
+      this.props.clientSheetData.length !== prevProps.clientSheetData.length
+    ) {
+      const data = PaymentRecordTable.formatClientData(
+        this.props.clientSheetData
+      );
       this.setState({
-        clientSheetData: this.props.clientSheetData,
+        clientSheetData: data,
       });
+    }
   }
 
   render() {
