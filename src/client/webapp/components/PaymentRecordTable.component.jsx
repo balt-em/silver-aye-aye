@@ -24,17 +24,14 @@ class PaymentRecordTable extends React.Component {
   // TODO: REMOVE or rework
   static formatClientData(clientData) {
     clientData.forEach(client => {
-      console.log(
-        'client',
-        client,
-        PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET,
-        client[PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET]
-      );
       const paidThroughDate = client[PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET];
       const terminationDate = client[TERMINATION_DATE_INDEX_ON_CLIENT_SHEET];
 
-      const startDate = new Date();
-      startDate.setDate(paidThroughDate.getDate() + 1);
+      let startDate;
+      if (paidThroughDate) {
+        startDate = new Date();
+        startDate.setDate(paidThroughDate.getDate() + 1);
+      }
 
       const endDate = terminationDate || new Date();
 

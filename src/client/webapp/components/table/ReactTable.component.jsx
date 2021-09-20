@@ -32,6 +32,7 @@ function GlobalFilter({
         placeholder={`${count} records...`}
         style={{
           fontSize: '1.1rem',
+          marginBottom: '10px',
         }}
       />
     </span>
@@ -72,7 +73,6 @@ function ReactTable(props) {
 
   return (
     <div>
-      {props.data.length}
       <GlobalFilter
         preGlobalFilteredRows={preGlobalFilteredRows}
         globalFilter={state.globalFilter}
@@ -84,7 +84,7 @@ function ReactTable(props) {
         hover
         {...getTableProps()}
         style={{
-          width: '95vw',
+          width: '100%',
           overflowX: 'auto',
           display: 'block',
         }}

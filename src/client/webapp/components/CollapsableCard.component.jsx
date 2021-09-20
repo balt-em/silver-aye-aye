@@ -19,7 +19,7 @@ class CollapsableCard extends React.Component {
     const { display, id } = this.state;
 
     return (
-      <Card>
+      <Card style={{ marginBottom: '15px' }}>
         <Card.Body>
           <Card.Title>
             {this.props.title}
