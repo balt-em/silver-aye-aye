@@ -3,7 +3,7 @@ import React from 'react';
 import { DataLayerContext } from '@utils/DataLayer.component';
 import * as indexes from '@shared/sheetconfig';
 import DetailPage from '../detail-view/Detail.page';
-import ReactTable from '../../components/ReactTable.component';
+import ReactTable from '../../components/table/ReactTable.component';
 
 class SearchPage extends React.Component {
   constructor(props) {

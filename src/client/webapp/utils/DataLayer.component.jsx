@@ -1,5 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {
+  CLIENT_HOOK_UP_DATE_INDEX_ON_CLIENT_SHEET,
+  CLIENTS_NEXT_COURT_DATE_INDEX_ON_CLIENT_SHEET,
+  CLIENTS_DATE_OF_BIRTH_INDEX_ON_CLIENT_SHEET,
+  TERMINATION_DATE_INDEX_ON_CLIENT_SHEET,
+  PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET,
+  SUBMITTED_ON_INDEX_ON_CLIENT_SHEET,
+  RESCHEULED_COURT_DATE_INDEX_ON_CLIENT_SHEET,
+} from '@shared/sheetconfig';
 import server from './server';
 
 const { serverFunctions } = server;
@@ -36,10 +45,23 @@ class DataLayer extends React.Component {
         const clientSheetHeaders = headers.map((header, index) => {
           return { accessor: `${index}`, Header: header };
         });
+        const dateFields = [
+          RESCHEULED_COURT_DATE_INDEX_ON_CLIENT_SHEET,
+          CLIENT_HOOK_UP_DATE_INDEX_ON_CLIENT_SHEET,
+          CLIENTS_NEXT_COURT_DATE_INDEX_ON_CLIENT_SHEET,
+          CLIENTS_DATE_OF_BIRTH_INDEX_ON_CLIENT_SHEET,
+          TERMINATION_DATE_INDEX_ON_CLIENT_SHEET,
+          PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET,
+          SUBMITTED_ON_INDEX_ON_CLIENT_SHEET,
+        ];
         const clientSheetData = rows.map(row => {
           const rowMap = {};
           row.forEach((field, index) => {
-            rowMap[index] = field;
+            if (dateFields.includes(index) && field) {
+              rowMap[index] = new Date(field);
+            } else {
+              rowMap[index] = field;
+            }
           });
           return rowMap;
         });
@@ -66,6 +88,16 @@ class DataLayer extends React.Component {
 
   static getReadableDate(dateString) {
     return dateString ? new Date(dateString).toLocaleDateString() : 'N/A';
+  }
+
+  // https://stackoverflow.com/questions/2627473/how-to-calculate-the-number-of-days-between-two-dates
+  // the difference between two dates including the start OR the end date: 1/1 - 1/1 is 0 days
+  static getDateDifExclusive(date1, date2) {
+    const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
+    const firstDate = date1;
+    const secondDate = date2;
+
+    return Math.floor(Math.abs((firstDate - secondDate) / oneDay));
   }
 
   // eslint-disable-next-line class-methods-use-this

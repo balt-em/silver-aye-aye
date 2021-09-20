@@ -7,6 +7,7 @@ import { useTable, useGlobalFilter, useSortBy } from 'react-table';
 import PropTypes from 'prop-types';
 
 import { CLIENT_ID_INDEX_ON_CLIENT_SHEET } from '@shared/sheetconfig';
+import Cell from './Cell.component';
 
 function GlobalFilter({
   preGlobalFilteredRows,
@@ -43,6 +44,10 @@ GlobalFilter.propTypes = {
   setGlobalFilter: PropTypes.func,
 };
 
+const defaultColumn = {
+  Cell,
+};
+
 function ReactTable(props) {
   const data = React.useMemo(() => props.data, [props.data.length]);
 
@@ -57,7 +62,11 @@ function ReactTable(props) {
     state,
     preGlobalFilteredRows,
     setGlobalFilter,
-  } = useTable({ columns, data }, useGlobalFilter, useSortBy);
+  } = useTable(
+    { columns, data, defaultColumn, updateMyData: props.updateMyData },
+    useGlobalFilter,
+    useSortBy
+  );
 
   const firstPageRows = rows.slice(0, props.maxDisplay);
 
@@ -136,6 +145,7 @@ ReactTable.propTypes = {
   columns: PropTypes.array,
   data: PropTypes.array,
   maxDisplay: PropTypes.number,
+  updateMyData: PropTypes.func,
 };
 
 export default ReactTable;
