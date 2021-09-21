@@ -3,23 +3,20 @@
 /* eslint-disable react/jsx-key */
 import React from 'react';
 import PropTypes from 'prop-types';
+import ReactDatePicker from 'react-datepicker';
 
 const EditableCell = ({
   value: initialValue,
   row: { index },
   column: { id },
-  updateMyData, // This is a custom function that we supplied to our table instance
+  updateData, // This is a custom function that we supplied to our table instance
 }) => {
   // We need to keep and update the state of the cell normally
   const [value, setValue] = React.useState(initialValue);
 
-  const onChange = e => {
-    setValue(e.target.value);
-  };
-
-  // We'll only update the external data when the input is blurred
-  const onBlur = () => {
-    updateMyData(index, id, value);
+  const onChange = val => {
+    // setValue(val);
+    updateData(index, id, val);
   };
 
   // If the initialValue is changed external, sync it up with our state
@@ -27,14 +24,14 @@ const EditableCell = ({
     setValue(initialValue);
   }, [initialValue]);
 
-  return <input value={value} onChange={onChange} onBlur={onBlur} />;
+  return <ReactDatePicker selected={value} onChange={onChange} />;
 };
 
 EditableCell.propTypes = {
   value: PropTypes.instanceOf(Date),
   row: PropTypes.object,
   column: PropTypes.object,
-  updateMyData: PropTypes.func,
+  updateData: PropTypes.func,
 };
 
 export default EditableCell;

@@ -58,13 +58,13 @@ class PaymentPage extends React.Component {
     });
   }
 
-  clickedClient(id) {
-    const newSelectedClients = { ...this.state.selectedClients };
-    newSelectedClients[id] = 1;
-    console.log('clickedClient', id);
-    this.setState(() => ({
-      selectedClients: newSelectedClients,
-    }));
+  // eslint-disable-next-line class-methods-use-this
+  clickedClient(rowIds) {
+    if (rowIds) {
+      this.setState(() => ({
+        selectedClients: rowIds,
+      }));
+    }
   }
 
   removeClient(id) {
@@ -89,16 +89,8 @@ class PaymentPage extends React.Component {
     const clientSheetData = this.state.clients;
 
     // could be done once instead of twice
-    const filteredClientData = clientSheetData.filter(clientData => {
-      return !this.state.selectedClients[
-        clientData[CLIENT_ID_INDEX_ON_CLIENT_SHEET]
-      ];
-    });
-
-    const selectedClientData = clientSheetData.filter(clientData => {
-      return this.state.selectedClients[
-        clientData[CLIENT_ID_INDEX_ON_CLIENT_SHEET]
-      ];
+    const selectedClientData = clientSheetData.filter((clientData, index) => {
+      return this.state.selectedClients[index];
     });
 
     return (
@@ -107,9 +99,9 @@ class PaymentPage extends React.Component {
         <CollapsableCard title={'Select Clients For Payment'}>
           <ReactTable
             columns={newHeaders}
-            data={filteredClientData}
-            clickedRow={this.clickedClient}
-            maxDisplay={5}
+            data={clientSheetData}
+            maxDisplay={10}
+            onSelect={this.clickedClient}
           />
         </CollapsableCard>
         <CollapsableCard title={'Choose How Much Was Paid For Client(s)'}>

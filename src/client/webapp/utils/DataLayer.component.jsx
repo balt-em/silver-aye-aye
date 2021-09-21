@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
+  CLIENT_ID_INDEX_ON_CLIENT_SHEET,
   CLIENT_HOOK_UP_DATE_INDEX_ON_CLIENT_SHEET,
   CLIENTS_NEXT_COURT_DATE_INDEX_ON_CLIENT_SHEET,
   CLIENTS_DATE_OF_BIRTH_INDEX_ON_CLIENT_SHEET,
@@ -59,10 +60,13 @@ class DataLayer extends React.Component {
           row.forEach((field, index) => {
             if (dateFields.includes(index) && field) {
               rowMap[index] = new Date(field);
+            } else if (dateFields.includes(index)) {
+              rowMap[index] = undefined;
             } else {
               rowMap[index] = field;
             }
           });
+          rowMap.id = row[CLIENT_ID_INDEX_ON_CLIENT_SHEET];
           return rowMap;
         });
 

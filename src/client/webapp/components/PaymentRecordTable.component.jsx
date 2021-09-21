@@ -18,7 +18,7 @@ class PaymentRecordTable extends React.Component {
   constructor(props) {
     super(props);
     this.state = { clientSheetData: [] };
-    this.updateMyData = this.updateMyData.bind(this);
+    this.updateData = this.updateData.bind(this);
   }
 
   // TODO: REMOVE or rework
@@ -42,30 +42,21 @@ class PaymentRecordTable extends React.Component {
     return clientData;
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  updateMyData(rowIndex, columnId, value) {
-    console.log('updateMyData', rowIndex, columnId, value);
-    // We also turn on the flag to not reset the page
-    // setSkipPageReset(true);
-    // setData(old =>
-    //   old.map((row, index) => {
-    //     if (index === rowIndex) {
-    //       return {
-    //         ...old[rowIndex],
-    //         [columnId]: value,
-    //       };
-    //     }
-    //     return row;
-    //   })
-    // );
-  }
+  updateData = (rowIndex, columnId, value) => {
+    const oldRow = this.state.clientSheetData[rowIndex];
+    const newRow = { ...oldRow, [columnId]: value };
+    const newClientSheetData = [...this.state.clientSheetData];
+    newClientSheetData[rowIndex] = newRow;
+
+    this.setState({ clientSheetData: newClientSheetData });
+  };
 
   componentDidMount() {
     const data = PaymentRecordTable.formatClientData(
       this.props.clientSheetData
     );
     this.setState({
-      clients: data,
+      clientSheetData: data,
     });
   }
 
@@ -108,7 +99,7 @@ class PaymentRecordTable extends React.Component {
       <ReactTable
         columns={newHeaders}
         data={clientSheetData}
-        // clickedRow={this.props.removeClient}
+        updateData={this.updateData}
         maxDisplay={100}
       />
     );
