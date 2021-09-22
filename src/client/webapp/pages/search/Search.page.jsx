@@ -15,10 +15,8 @@ class SearchPage extends React.Component {
 
   static contextType = DataLayerContext;
 
-  clickedClient(id) {
-    const client = this.context.clientSheetData.filter(
-      row => row[indexes.CLIENT_ID_INDEX_ON_CLIENT_SHEET] === id
-    )[0];
+  clickedClient(index) {
+    const client = this.context.clientSheetData[index];
     this.setState(() => ({
       curClient: client, // don't include header
       showModal: true,

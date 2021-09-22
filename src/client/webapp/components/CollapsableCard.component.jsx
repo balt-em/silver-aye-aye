@@ -34,7 +34,9 @@ class CollapsableCard extends React.Component {
               {this.state.display ? 'Collapse' : 'Show'}
             </button>
           </Card.Title>
-          {display && <div id={id}>{this.props.children}</div>}
+          <div style={this.state.display ? {} : { display: 'none' }} id={id}>
+            {this.props.children}
+          </div>
         </Card.Body>
       </Card>
     );

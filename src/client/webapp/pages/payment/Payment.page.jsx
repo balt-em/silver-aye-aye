@@ -19,10 +19,10 @@ class PaymentPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = { selectedClients: {}, clients: [] };
-    this.clickedClient = this.clickedClient.bind(this);
-    this.removeClient = this.removeClient.bind(this);
+    this.changedSelectedClients = this.changedSelectedClients.bind(this);
   }
 
+  // remove clients who BALT has already finished paying for
   static filterClients(clientData) {
     const filteredClientData = clientData.filter(client => {
       const terminationDate =
@@ -59,21 +59,12 @@ class PaymentPage extends React.Component {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  clickedClient(rowIds) {
+  changedSelectedClients(rowIds) {
     if (rowIds) {
       this.setState(() => ({
         selectedClients: rowIds,
       }));
     }
-  }
-
-  removeClient(id) {
-    const newSelectedClients = { ...this.state.selectedClients };
-    newSelectedClients[id] = undefined;
-    console.log('removeClient', id);
-    this.setState(() => ({
-      selectedClients: newSelectedClients,
-    }));
   }
 
   render() {
@@ -88,7 +79,6 @@ class PaymentPage extends React.Component {
 
     const clientSheetData = this.state.clients;
 
-    // could be done once instead of twice
     const selectedClientData = clientSheetData.filter((clientData, index) => {
       return this.state.selectedClients[index];
     });
@@ -101,7 +91,7 @@ class PaymentPage extends React.Component {
             columns={newHeaders}
             data={clientSheetData}
             maxDisplay={10}
-            onSelect={this.clickedClient}
+            onSelect={this.changedSelectedClients}
           />
         </CollapsableCard>
         <CollapsableCard title={'Choose How Much Was Paid For Client(s)'}>
@@ -109,7 +99,6 @@ class PaymentPage extends React.Component {
             <PaymentRecordTable
               columns={newHeaders}
               clientSheetData={selectedClientData}
-              removeClient={this.removeClient}
             ></PaymentRecordTable>
           ) : (
             <Card.Text>No Clients Yet Selected</Card.Text>

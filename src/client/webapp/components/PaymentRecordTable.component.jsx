@@ -21,7 +21,6 @@ class PaymentRecordTable extends React.Component {
     this.updateData = this.updateData.bind(this);
   }
 
-  // TODO: REMOVE or rework
   static formatClientData(clientData) {
     clientData.forEach(client => {
       const paidThroughDate = client[PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET];
@@ -107,7 +106,6 @@ class PaymentRecordTable extends React.Component {
 }
 
 PaymentRecordTable.propTypes = {
-  removeClient: PropTypes.func,
   columns: PropTypes.array,
   clientSheetData: PropTypes.array,
 };

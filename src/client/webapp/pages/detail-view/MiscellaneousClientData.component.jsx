@@ -53,6 +53,6 @@ class MiscellaneousClientData extends React.Component {
 }
 
 MiscellaneousClientData.propTypes = {
-  clientData: PropTypes.array.isRequired,
+  clientData: PropTypes.object.isRequired,
 };
 export default MiscellaneousClientData;
