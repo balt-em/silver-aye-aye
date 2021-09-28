@@ -18,13 +18,12 @@ import {
   PAID_BY_INDEX_ON_PAYMENT_OVERVIEW_SHEET,
   PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET,
 } from '@shared/sheetconfig';
+import { getDate } from '@shared/utils';
 import {
   getClientSheet,
   getPaymentSheetValues,
   updatePaymentData,
 } from './sheets';
-
-import { getDate } from './utils';
 
 // eslint-disable-next-line import/prefer-default-export
 export const doGet = () => {
@@ -133,7 +132,7 @@ export const addPaymentRecord = data => {
     );
     const eDate = getDate(endDate);
     const sDate = getDate(startDate);
-    const tDate = getDate(terminationDate);
+    const tDate = terminationDate && getDate(terminationDate);
     const record = Array(5);
     record[CLIENT_ID_INDEX_ON_PAYMENT_SHEET] = id;
     record[PAYMENT_ID_INDEX_ON_PAYMENT_SHEET] = paymentId;
@@ -143,7 +142,7 @@ export const addPaymentRecord = data => {
       record[REIMBURSEMENT_INDEX_ON_PAYMENT_SHEET] = 'n';
     } else {
       record[START_DATE_INDEX_ON_PAYMENT_SHEET] = startDate;
-      const reimbursementStartDate = new Date(
+      const reimbursementStartDate = getDate(
         paidThroughDate.valueOf() + 1000 * 3600 * 24
       );
 

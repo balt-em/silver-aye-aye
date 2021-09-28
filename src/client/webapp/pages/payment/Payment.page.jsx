@@ -2,6 +2,7 @@
 import React from 'react';
 import ReactDatePicker from 'react-datepicker';
 import { Card, Form, Col } from 'react-bootstrap';
+import { getDate } from '@shared/utils';
 
 import DataLayer, { DataLayerContext } from '@utils/DataLayer.component';
 import {
@@ -25,7 +26,7 @@ class PaymentPage extends React.Component {
       selectedClients: {},
       clients: [],
       rate: 12,
-      datePaid: new Date(),
+      datePaid: getDate(),
       initials: '',
       companyName: 'ASAP',
     };
@@ -41,10 +42,10 @@ class PaymentPage extends React.Component {
     const filteredClientData = clientData.filter(client => {
       const terminationDate =
         client[TERMINATION_DATE_INDEX_ON_CLIENT_SHEET] &&
-        new Date(client[TERMINATION_DATE_INDEX_ON_CLIENT_SHEET]);
+        getDate(client[TERMINATION_DATE_INDEX_ON_CLIENT_SHEET]);
       const paidThroughDate =
         client[PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET] &&
-        new Date(client[PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET]);
+        getDate(client[PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET]);
 
       if (!terminationDate) {
         return true;
@@ -73,11 +74,11 @@ class PaymentPage extends React.Component {
 
       let startDate;
       if (paidThroughDate) {
-        startDate = new Date();
+        startDate = getDate(paidThroughDate.getTime());
         startDate.setDate(paidThroughDate.getDate() + 1);
       }
 
-      const endDate = terminationDate || new Date();
+      const endDate = terminationDate || getDate();
 
       client.startDate = startDate;
       client.endDate = startDate > endDate ? undefined : endDate;

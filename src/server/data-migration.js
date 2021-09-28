@@ -1,7 +1,8 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable import/first */
 import { CLIENT_NAME_INDEX_ON_INTAKE_FORM } from '@shared/sheetconfig';
-import * as indexes from '@shared/sheetconfig';
+import { getDate } from '@shared/utils';
+
 import { v4 as uuidv4 } from 'uuid';
 import {
   getSheets,
@@ -104,7 +105,7 @@ const setClientSheetData = (intakeFormData, clientSheet) => {
 const groupPaymentData = paymentData => {
   const paymentsGroupedByDate = {};
   paymentData.forEach(payment => {
-    const paymentDate = new Date(payment.datePaid);
+    const paymentDate = getDate(payment.datePaid);
     const dateString = `${paymentDate.getMonth() +
       1}/${paymentDate.getDate()}/${paymentDate.getFullYear()}`;
 

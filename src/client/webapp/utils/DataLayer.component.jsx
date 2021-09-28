@@ -9,7 +9,9 @@ import {
   PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET,
   SUBMITTED_ON_INDEX_ON_CLIENT_SHEET,
   RESCHEULED_COURT_DATE_INDEX_ON_CLIENT_SHEET,
+  PAYMENT_PICKUP_DATE_INDEX_ON_CLIENT_SHEET,
 } from '@shared/sheetconfig';
+import { getDate } from '@shared/utils';
 import server from './server';
 
 const { serverFunctions } = server;
@@ -50,6 +52,7 @@ class DataLayer extends React.Component {
         });
         const dateFields = [
           RESCHEULED_COURT_DATE_INDEX_ON_CLIENT_SHEET,
+          PAYMENT_PICKUP_DATE_INDEX_ON_CLIENT_SHEET,
           CLIENT_HOOK_UP_DATE_INDEX_ON_CLIENT_SHEET,
           CLIENTS_NEXT_COURT_DATE_INDEX_ON_CLIENT_SHEET,
           CLIENTS_DATE_OF_BIRTH_INDEX_ON_CLIENT_SHEET,
@@ -61,7 +64,7 @@ class DataLayer extends React.Component {
           const rowMap = {};
           row.forEach((field, index) => {
             if (dateFields.includes(index) && field) {
-              rowMap[index] = new Date(field);
+              rowMap[index] = getDate(field);
             } else if (dateFields.includes(index)) {
               rowMap[index] = undefined;
             } else {
@@ -93,7 +96,7 @@ class DataLayer extends React.Component {
   }
 
   static getReadableDate(dateString) {
-    return dateString ? new Date(dateString).toLocaleDateString() : 'N/A';
+    return dateString ? getDate(dateString).toLocaleDateString() : 'N/A';
   }
 
   // https://stackoverflow.com/questions/2627473/how-to-calculate-the-number-of-days-between-two-dates

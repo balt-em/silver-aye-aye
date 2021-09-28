@@ -19,6 +19,7 @@ import {
   RATE_INDEX_ON_PAYMENT_OVERVIEW_SHEET,
   TOTAL_INDEX_ON_PAYMENT_OVERVIEW_SHEET,
 } from '@shared/sheetconfig';
+import { getDate } from '@shared/utils';
 
 export const [
   INTAKE_FORM_SHEET_INDEX,
@@ -144,8 +145,8 @@ function updateTotalCosts(
     const clientId = row[CLIENT_ID_INDEX_ON_PAYMENT_SHEET];
     const terminationDate = clientTerminationDateDict[clientId];
     const paymentId = row[PAYMENT_ID_INDEX_ON_PAYMENT_SHEET];
-    const startDate = new Date(row[START_DATE_INDEX_ON_PAYMENT_SHEET]);
-    const endDate = new Date(row[END_DATE_INDEX_ON_PAYMENT_SHEET]);
+    const startDate = getDate(row[START_DATE_INDEX_ON_PAYMENT_SHEET]);
+    const endDate = getDate(row[END_DATE_INDEX_ON_PAYMENT_SHEET]);
     const reimbursement = row[REIMBURSEMENT_INDEX_ON_PAYMENT_SHEET];
 
     const inclusiveDateDif = getDateDifInclusive(startDate, endDate);
@@ -192,7 +193,7 @@ function updateTotalCosts(
   clientData.forEach(row => {
     const clientId = row[CLIENT_ID_INDEX_ON_CLIENT_SHEET];
     const terminationDate = clientTerminationDateDict[clientId];
-    const paymentDueThroughDate = terminationDate || new Date();
+    const paymentDueThroughDate = terminationDate || getDate();
     const paidThroughDate = paidThroughDateDict[clientId];
     // don't want to include the date you paid through
     const dateDif = getDateDifExclusive(paymentDueThroughDate, paidThroughDate);
@@ -280,7 +281,7 @@ function getClientTerminationDateDict(clientData) {
     const terminationDate = row[TERMINATION_DATE_INDEX_ON_CLIENT_SHEET];
     if (terminationDate) {
       const clientId = row[CLIENT_ID_INDEX_ON_CLIENT_SHEET];
-      clientTerminationDateDict[clientId] = new Date(terminationDate);
+      clientTerminationDateDict[clientId] = getDate(terminationDate);
     }
   });
 
