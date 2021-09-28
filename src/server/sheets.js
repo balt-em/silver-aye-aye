@@ -15,6 +15,9 @@ import {
   START_DATE_INDEX_ON_PAYMENT_SHEET,
   END_DATE_INDEX_ON_PAYMENT_SHEET,
   REIMBURSEMENT_INDEX_ON_PAYMENT_SHEET,
+  PAYMENT_ID_INDEX_ON_PAYMENT_OVERVIEW_SHEET,
+  RATE_INDEX_ON_PAYMENT_OVERVIEW_SHEET,
+  TOTAL_INDEX_ON_PAYMENT_OVERVIEW_SHEET,
 } from '@shared/sheetconfig';
 
 export const [
@@ -24,14 +27,6 @@ export const [
   PAYMENT_OVERVIEW_SHEET_INDEX,
 ] = [...Array(4).keys()];
 
-const [
-  paymentIdIndexOnPaymentOverview,
-  rateIndexOnPaymentOverview,
-  datePaidIndexOnPaymentOverview,
-  paidByIndexOnPaymentOverview,
-  reciptUrlIndexOnPaymentOverview,
-  totalIndexOnPaymentOverview,
-] = [...Array(6).keys()];
 // TODO we need to figure out a better way to assigned sequential numbers for our rows
 const spreadsheetUrl =
   'https://docs.google.com/spreadsheets/d/1wyPjcdA8DVUeCbyYCanyOaBxcv_YlJK8WIrPnQ0JeOk/edit#gid=518849693';
@@ -99,8 +94,8 @@ function updateTotalCosts(
   const paymentRateDict = {};
 
   paymentOverviewData.forEach(row => {
-    paymentRateDict[row[paymentIdIndexOnPaymentOverview]] =
-      row[rateIndexOnPaymentOverview];
+    paymentRateDict[row[PAYMENT_ID_INDEX_ON_PAYMENT_OVERVIEW_SHEET]] =
+      row[RATE_INDEX_ON_PAYMENT_OVERVIEW_SHEET];
   });
 
   const paymentPickupDateDict = {};
@@ -230,8 +225,8 @@ function updateTotalCosts(
     paymentOverviewSheet,
     paymentOverviewSheetDataRange,
     paymentTotalCostDict,
-    paymentIdIndexOnPaymentOverview,
-    totalIndexOnPaymentOverview
+    PAYMENT_ID_INDEX_ON_PAYMENT_OVERVIEW_SHEET,
+    TOTAL_INDEX_ON_PAYMENT_OVERVIEW_SHEET
   );
 
   updateColumnFromDictionary(
@@ -332,6 +327,24 @@ export const getSheetsData = () => {
 export const getClientSheet = () => {
   const clientSheet = getSheets(true)[CLIENT_SHEET_INDEX];
   return clientSheet.getDataRange().getValues();
+};
+
+export const updatePaymentData = (paymentOverviewRow, paymentBreakdownData) => {
+  const sheets = getSheets(true);
+  const paymentOverviewSheet = sheets[PAYMENT_OVERVIEW_SHEET_INDEX];
+  const paymentBreakdownSheet = sheets[PAYMENT_BREAKDOWN_SHEET_INDEX];
+
+  paymentOverviewSheet.appendRow(paymentOverviewRow);
+
+  const lastRow = paymentBreakdownSheet.getLastRow();
+  const dataRange = paymentBreakdownSheet.getRange(
+    lastRow + 1,
+    1,
+    paymentBreakdownData.length,
+    paymentBreakdownData[0].length
+  );
+  dataRange.setValues(paymentBreakdownData);
+  // return clientSheet.getDataRange().getValues();
 };
 
 export const getSheet = (index, useUrl) => {

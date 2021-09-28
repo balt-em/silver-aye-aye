@@ -1,4 +1,8 @@
+/* eslint-disable no-param-reassign */
 import React from 'react';
+import ReactDatePicker from 'react-datepicker';
+import { Card, Form, Col } from 'react-bootstrap';
+
 import DataLayer, { DataLayerContext } from '@utils/DataLayer.component';
 import {
   CLIENT_ID_INDEX_ON_CLIENT_SHEET,
@@ -8,7 +12,6 @@ import {
   NUMBER_OF_DAYS_OWED_INDEX_ON_CLIENT_SHEET,
   CLIENT_NAME_INDEX_ON_CLIENT_SHEET,
 } from '@shared/sheetconfig';
-import { Card } from 'react-bootstrap';
 import ReactTable from '../../components/table/ReactTable.component';
 import CollapsableCard from '../../components/CollapsableCard.component';
 import PaymentRecordTable from '../../components/PaymentRecordTable.component';
@@ -18,8 +21,19 @@ class PaymentPage extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { selectedClients: {}, clients: [] };
+    this.state = {
+      selectedClients: {},
+      clients: [],
+      rate: 12,
+      datePaid: new Date(),
+      initials: '',
+      companyName: 'ASAP',
+    };
     this.changedSelectedClients = this.changedSelectedClients.bind(this);
+    this.savePaymentRecord = this.savePaymentRecord.bind(this);
+    this.getSelectedClients = this.getSelectedClients.bind(this);
+    this.updateData = this.updateData.bind(this);
+    this.updateClientData = this.updateClientData.bind(this);
   }
 
   // remove clients who BALT has already finished paying for
@@ -52,10 +66,55 @@ class PaymentPage extends React.Component {
     return filteredClientData;
   }
 
+  static formatClientData(clientData) {
+    clientData.forEach(client => {
+      const paidThroughDate = client[PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET];
+      const terminationDate = client[TERMINATION_DATE_INDEX_ON_CLIENT_SHEET];
+
+      let startDate;
+      if (paidThroughDate) {
+        startDate = new Date();
+        startDate.setDate(paidThroughDate.getDate() + 1);
+      }
+
+      const endDate = terminationDate || new Date();
+
+      client.startDate = startDate;
+      client.endDate = startDate > endDate ? undefined : endDate;
+      client.terminationDate = terminationDate;
+    });
+    return clientData;
+  }
+
+  getSelectedClients() {
+    return this.state.clients.filter((_, index) => {
+      return this.state.selectedClients[index];
+    });
+  }
+
+  updateData(val, valToUpdate) {
+    this.setState({
+      [valToUpdate]: val,
+    });
+  }
+
   componentDidMount() {
     this.setState({
-      clients: PaymentPage.filterClients(this.context.clientSheetData),
+      clients: PaymentPage.formatClientData(
+        PaymentPage.filterClients(this.context.clientSheetData)
+      ),
     });
+  }
+
+  savePaymentRecord() {
+    const clients = this.getSelectedClients();
+    this.context.addPaymentRecord(
+      clients,
+      this.state.rate,
+      this.state.companyName,
+      this.state.initials,
+      this.state.datePaid
+    );
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -65,6 +124,21 @@ class PaymentPage extends React.Component {
         selectedClients: rowIds,
       }));
     }
+  }
+
+  updateClientData(row, columnId, value) {
+    const id = row.values[CLIENT_ID_INDEX_ON_CLIENT_SHEET];
+
+    const oldRow = this.state.clients.find(
+      client => client[CLIENT_ID_INDEX_ON_CLIENT_SHEET] === id
+    );
+    console.log('this.state.clients[rowIndex]', oldRow, columnId, value);
+    oldRow[columnId] = value;
+    // const newRow = { ...oldRow, [columnId]: value };
+    // const newClientSheetData = [...this.state.clients];
+    // newClientSheetData[rowIndex] = newRow;
+
+    // this.setState({ clients: newClientSheetData });
   }
 
   render() {
@@ -79,9 +153,7 @@ class PaymentPage extends React.Component {
 
     const clientSheetData = this.state.clients;
 
-    const selectedClientData = clientSheetData.filter((clientData, index) => {
-      return this.state.selectedClients[index];
-    });
+    const selectedClientData = this.getSelectedClients();
 
     return (
       <div>
@@ -95,14 +167,71 @@ class PaymentPage extends React.Component {
           />
         </CollapsableCard>
         <CollapsableCard title={'Choose How Much Was Paid For Client(s)'}>
+          <Form.Row className="mb-3">
+            <Col>
+              <Form.Group controlId="formBasicPassword">
+                <Form.Label>Client Rate: $/day for company</Form.Label>
+                <Form.Control
+                  type="number"
+                  placeholder="10, 12"
+                  value={this.state.rate}
+                  onChange={e => this.updateData(e.target.value, 'rate')}
+                />
+              </Form.Group>
+            </Col>
+            <Col>
+              <Form.Group>
+                <Form.Label>Initials of person who paid</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="JB, MF"
+                  value={this.state.initials}
+                  onChange={e => this.updateData(e.target.value, 'initials')}
+                />
+              </Form.Group>
+            </Col>
+            <Col>
+              <Form.Group>
+                <Form.Label>Company name</Form.Label>
+                <Form.Control
+                  as="select"
+                  value={this.state.companyName}
+                  onChange={e => this.updateData(e.target.value, 'companyName')}
+                >
+                  <option>ASAP</option>
+                  <option>ALERT</option>
+                </Form.Control>
+              </Form.Group>
+            </Col>
+            <Col>
+              <Form.Group>
+                <Form.Label>Date paid</Form.Label>
+                <ReactDatePicker
+                  selected={this.state.datePaid}
+                  onChange={e => this.updateData(e, 'datePaid')}
+                />
+              </Form.Group>
+            </Col>
+          </Form.Row>
           {selectedClientData.length ? (
             <PaymentRecordTable
               columns={newHeaders}
               clientSheetData={selectedClientData}
+              updateData={this.updateClientData}
             ></PaymentRecordTable>
           ) : (
             <Card.Text>No Clients Yet Selected</Card.Text>
           )}
+          <Card.Footer>
+            <button
+              style={{ float: 'right', width: '10rem' }}
+              className="btn btn-primary"
+              type="button"
+              onClick={this.savePaymentRecord}
+            >
+              Save
+            </button>
+          </Card.Footer>
         </CollapsableCard>
       </div>
     );

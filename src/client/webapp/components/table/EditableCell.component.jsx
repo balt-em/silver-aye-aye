@@ -7,7 +7,7 @@ import ReactDatePicker from 'react-datepicker';
 
 const EditableCell = ({
   value: initialValue,
-  row: { index },
+  row,
   column: { id },
   updateData, // This is a custom function that we supplied to our table instance
 }) => {
@@ -15,8 +15,8 @@ const EditableCell = ({
   const [value, setValue] = React.useState(initialValue);
 
   const onChange = val => {
-    // setValue(val);
-    updateData(index, id, val);
+    setValue(val);
+    updateData(row, id, val);
   };
 
   // If the initialValue is changed external, sync it up with our state

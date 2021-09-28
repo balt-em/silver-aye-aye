@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable import/first */
-import getRandomValues from 'polyfill-crypto.getrandomvalues';
 import { CLIENT_NAME_INDEX_ON_INTAKE_FORM } from '@shared/sheetconfig';
 import * as indexes from '@shared/sheetconfig';
+import { v4 as uuidv4 } from 'uuid';
 import {
   getSheets,
   getSheetValues,
@@ -12,13 +12,6 @@ import {
   PAYMENT_BREAKDOWN_SHEET_INDEX,
   PAYMENT_OVERVIEW_SHEET_INDEX,
 } from './sheets';
-
-global.crypto = {
-  getRandomValues,
-};
-
-// eslint-disable-next-line import/order
-import { v4 as uuidv4 } from 'uuid';
 
 const [
   NAME_INDEX_ON_BALT_PAYMENT_SHEET,
@@ -197,7 +190,7 @@ const matchClientDataWithPaymentData = (intakeFormValues, asapSheetValues) => {
   Object.keys(groupedPaymentData).forEach(key => {
     const payment = groupedPaymentData[key];
     // Payment Id	Rate/Day	Date Paid	Paid by
-    const formattedPayment = [payment.id, payment.rate, key, payment.paidBy];
+    const formattedPayment = [payment.id, payment.rate, key, payment.paidBy]; // CHANGE IF COLUMN CHANGE
     formattedPaymentOverviewData.push(formattedPayment);
     const { payments } = payment;
     // Client Id	Payment Id	Start Date	End Date	Reimbursement?	Notes

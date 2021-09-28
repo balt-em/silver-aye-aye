@@ -17,6 +17,7 @@ const { serverFunctions } = server;
 export const DataLayerContext = React.createContext({
   getClientPaymentData: () => 'not implemented',
   updateClientData: () => 'not implemented',
+  addPaymentRecord: () => 'not implemented',
   totals: {},
   clientSheetHeaders: [],
   clientSheetData: [],
@@ -34,6 +35,7 @@ class DataLayer extends React.Component {
       clientSheetData: [],
     };
     this.updateClientData = this.updateClientData.bind(this);
+    this.addPaymentRecord = this.addPaymentRecord.bind(this);
     this.getClientPaymentData = this.getClientPaymentData.bind(this);
   }
 
@@ -105,6 +107,21 @@ class DataLayer extends React.Component {
   }
 
   // eslint-disable-next-line class-methods-use-this
+  addPaymentRecord(data, rate, companyName, initials, datePaid) {
+    console.log('paymentData', data);
+    console.log('paymentData', rate, companyName, initials, datePaid);
+    serverFunctions.addPaymentRecord(
+      JSON.stringify({
+        paymentBreakdownData: data,
+        rate,
+        companyName,
+        initials,
+        datePaid,
+      })
+    );
+  }
+
+  // eslint-disable-next-line class-methods-use-this
   updateClientData(data) {
     console.log('called updateData callback', data);
   }
@@ -123,6 +140,7 @@ class DataLayer extends React.Component {
       totals: this.state.totals,
       getClientPaymentData: this.getClientPaymentData,
       updateClientData: this.updateClientData,
+      addPaymentRecord: this.addPaymentRecord,
     };
 
     return (

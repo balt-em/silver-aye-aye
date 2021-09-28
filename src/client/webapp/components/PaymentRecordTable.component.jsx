@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 import React from 'react';
 import { DataLayerContext } from '@utils/DataLayer.component';
 import {
@@ -18,59 +17,29 @@ class PaymentRecordTable extends React.Component {
   constructor(props) {
     super(props);
     this.state = { clientSheetData: [] };
-    this.updateData = this.updateData.bind(this);
   }
 
-  static formatClientData(clientData) {
-    clientData.forEach(client => {
-      const paidThroughDate = client[PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET];
-      const terminationDate = client[TERMINATION_DATE_INDEX_ON_CLIENT_SHEET];
+  // componentDidMount() {
+  //   const data = PaymentRecordTable.formatClientData(
+  //     this.props.clientSheetData
+  //   );
+  //   this.setState({
+  //     clientSheetData: data,
+  //   });
+  // }
 
-      let startDate;
-      if (paidThroughDate) {
-        startDate = new Date();
-        startDate.setDate(paidThroughDate.getDate() + 1);
-      }
-
-      const endDate = terminationDate || new Date();
-
-      client.startDate = startDate;
-      client.endDate = startDate > endDate ? undefined : endDate;
-      client.terminationDate = terminationDate;
-    });
-    return clientData;
-  }
-
-  updateData = (rowIndex, columnId, value) => {
-    const oldRow = this.state.clientSheetData[rowIndex];
-    const newRow = { ...oldRow, [columnId]: value };
-    const newClientSheetData = [...this.state.clientSheetData];
-    newClientSheetData[rowIndex] = newRow;
-
-    this.setState({ clientSheetData: newClientSheetData });
-  };
-
-  componentDidMount() {
-    const data = PaymentRecordTable.formatClientData(
-      this.props.clientSheetData
-    );
-    this.setState({
-      clientSheetData: data,
-    });
-  }
-
-  componentDidUpdate(prevProps) {
-    if (
-      this.props.clientSheetData.length !== prevProps.clientSheetData.length
-    ) {
-      const data = PaymentRecordTable.formatClientData(
-        this.props.clientSheetData
-      );
-      this.setState({
-        clientSheetData: data,
-      });
-    }
-  }
+  // componentDidUpdate(prevProps) {
+  //   if (
+  //     this.props.clientSheetData.length !== prevProps.clientSheetData.length
+  //   ) {
+  //     const data = PaymentRecordTable.formatClientData(
+  //       this.props.clientSheetData
+  //     );
+  //     this.setState({
+  //       clientSheetData: data,
+  //     });
+  //   }
+  // }
 
   render() {
     const headers = this.context.clientSheetHeaders;
@@ -92,13 +61,13 @@ class PaymentRecordTable extends React.Component {
     // { accessor: `${index}`, Header: header, Cell: EditableCell, }
     // { index: value }
 
-    const { clientSheetData } = this.state;
+    const { clientSheetData, updateData } = this.props;
 
     return (
       <ReactTable
         columns={newHeaders}
         data={clientSheetData}
-        updateData={this.updateData}
+        updateData={updateData}
         maxDisplay={100}
       />
     );
@@ -108,6 +77,7 @@ class PaymentRecordTable extends React.Component {
 PaymentRecordTable.propTypes = {
   columns: PropTypes.array,
   clientSheetData: PropTypes.array,
+  updateData: PropTypes.func,
 };
 
 export default PaymentRecordTable;
