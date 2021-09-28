@@ -7,3 +7,11 @@ export const getDate = dateString => {
   date.setSeconds(0);
   return date;
 };
+
+export const normalizeDate = date => {
+  date.setUTCHours(16); // noon in Baltimore
+  date.setMinutes(0);
+  date.setMilliseconds(0);
+  date.setSeconds(0);
+  return date;
+};

@@ -19,28 +19,6 @@ class PaymentRecordTable extends React.Component {
     this.state = { clientSheetData: [] };
   }
 
-  // componentDidMount() {
-  //   const data = PaymentRecordTable.formatClientData(
-  //     this.props.clientSheetData
-  //   );
-  //   this.setState({
-  //     clientSheetData: data,
-  //   });
-  // }
-
-  // componentDidUpdate(prevProps) {
-  //   if (
-  //     this.props.clientSheetData.length !== prevProps.clientSheetData.length
-  //   ) {
-  //     const data = PaymentRecordTable.formatClientData(
-  //       this.props.clientSheetData
-  //     );
-  //     this.setState({
-  //       clientSheetData: data,
-  //     });
-  //   }
-  // }
-
   render() {
     const headers = this.context.clientSheetHeaders;
     const newHeaders = [
@@ -56,6 +34,8 @@ class PaymentRecordTable extends React.Component {
         Header: 'Termination Date',
         Cell: EditableCell,
       },
+      { accessor: 'paid', Header: 'Amount Paid' },
+      { accessor: 'reimbursementUsed', Header: 'Reimbursement Used' },
     ];
 
     // { accessor: `${index}`, Header: header, Cell: EditableCell, }

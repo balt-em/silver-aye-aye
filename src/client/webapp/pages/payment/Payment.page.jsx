@@ -23,7 +23,7 @@ class PaymentPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedClients: {},
+      selectedClients: [],
       clients: [],
       rate: 12,
       datePaid: getDate(),
@@ -32,9 +32,9 @@ class PaymentPage extends React.Component {
     };
     this.changedSelectedClients = this.changedSelectedClients.bind(this);
     this.savePaymentRecord = this.savePaymentRecord.bind(this);
-    this.getSelectedClients = this.getSelectedClients.bind(this);
     this.updateData = this.updateData.bind(this);
     this.updateClientData = this.updateClientData.bind(this);
+    this.updateCalculatedValues = this.updateCalculatedValues.bind(this);
   }
 
   // remove clients who BALT has already finished paying for
@@ -87,10 +87,24 @@ class PaymentPage extends React.Component {
     return clientData;
   }
 
-  getSelectedClients() {
-    return this.state.clients.filter((_, index) => {
-      return this.state.selectedClients[index];
-    });
+  changedSelectedClients(rowIds) {
+    if (rowIds) {
+      const selectedClients = this.state.clients.filter((_, index) => {
+        return rowIds[index];
+      });
+      const editedSelectedClients = selectedClients.map(selectedClient => {
+        const updatedClient = this.state.selectedClients.find(
+          curSelectedClient => {
+            return curSelectedClient.id === selectedClient.id;
+          }
+        );
+        return updatedClient || selectedClient;
+      });
+
+      this.setState(() => ({
+        selectedClients: editedSelectedClients,
+      }));
+    }
   }
 
   updateData(val, valToUpdate) {
@@ -108,9 +122,8 @@ class PaymentPage extends React.Component {
   }
 
   savePaymentRecord() {
-    const clients = this.getSelectedClients();
     this.context.addPaymentRecord(
-      clients,
+      this.state.selectedClients,
       this.state.rate,
       this.state.companyName,
       this.state.initials,
@@ -118,28 +131,38 @@ class PaymentPage extends React.Component {
     );
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  changedSelectedClients(rowIds) {
-    if (rowIds) {
-      this.setState(() => ({
-        selectedClients: rowIds,
-      }));
+  updateCalculatedValues(client) {
+    const { startDate, endDate, terminationDate } = client;
+    if (!terminationDate || (terminationDate && terminationDate >= endDate)) {
+      const cost =
+        DataLayer.getDateDifInclusive(startDate, endDate) * this.state.rate;
+      client.reimbursementUsed = '';
+      client.paid = `$${cost}`;
+    } else {
+      const reimbursementEndDate =
+        client[PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET];
+
+      const reimbursement =
+        DataLayer.getDateDifExclusive(reimbursementEndDate, terminationDate) *
+        this.state.rate; // TODO: should use OLD rate
+      client.reimbursementUsed = `$${reimbursement}`;
+      client.paid = '';
     }
   }
 
-  updateClientData(row, columnId, value) {
-    const id = row.values[CLIENT_ID_INDEX_ON_CLIENT_SHEET];
+  updateClientData(row, columnId, value, rowId) {
+    // const id = row.values[CLIENT_ID_INDEX_ON_CLIENT_SHEET];
 
-    const oldRow = this.state.clients.find(
-      client => client[CLIENT_ID_INDEX_ON_CLIENT_SHEET] === id
-    );
-    console.log('this.state.clients[rowIndex]', oldRow, columnId, value);
-    oldRow[columnId] = value;
-    // const newRow = { ...oldRow, [columnId]: value };
-    // const newClientSheetData = [...this.state.clients];
-    // newClientSheetData[rowIndex] = newRow;
+    const newRow = { ...this.state.selectedClients[rowId] };
+    newRow[columnId] = value;
 
-    // this.setState({ clients: newClientSheetData });
+    this.updateCalculatedValues(newRow);
+    const updatedSelectedClients = [
+      ...this.state.selectedClients.slice(0, rowId),
+      newRow,
+      ...this.state.selectedClients.slice(rowId + 1),
+    ];
+    this.setState({ selectedClients: updatedSelectedClients });
   }
 
   render() {
@@ -153,8 +176,6 @@ class PaymentPage extends React.Component {
     ];
 
     const clientSheetData = this.state.clients;
-
-    const selectedClientData = this.getSelectedClients();
 
     return (
       <div>
@@ -214,10 +235,10 @@ class PaymentPage extends React.Component {
               </Form.Group>
             </Col>
           </Form.Row>
-          {selectedClientData.length ? (
+          {this.state.selectedClients.length ? (
             <PaymentRecordTable
               columns={newHeaders}
-              clientSheetData={selectedClientData}
+              clientSheetData={this.state.selectedClients}
               updateData={this.updateClientData}
             ></PaymentRecordTable>
           ) : (

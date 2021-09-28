@@ -1,6 +1,8 @@
 /* eslint-disable no-nested-ternary */
 // Normally a good rule, ReactTable adds keys with it's props as long as you add those you should be good
 /* eslint-disable react/jsx-key */
+import { normalizeDate } from '@shared/utils';
+
 import React from 'react';
 import PropTypes from 'prop-types';
 import ReactDatePicker from 'react-datepicker';
@@ -15,8 +17,8 @@ const EditableCell = ({
   const [value, setValue] = React.useState(initialValue);
 
   const onChange = val => {
-    setValue(val);
-    updateData(row, id, val);
+    normalizeDate(val);
+    updateData(row, id, val, row.id);
   };
 
   // If the initialValue is changed external, sync it up with our state

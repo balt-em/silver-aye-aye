@@ -22,6 +22,7 @@ import { getDate } from '@shared/utils';
 import {
   getClientSheet,
   getPaymentSheetValues,
+  onEdit,
   updatePaymentData,
 } from './sheets';
 
@@ -138,22 +139,20 @@ export const addPaymentRecord = data => {
     const record = Array(5);
     record[CLIENT_ID_INDEX_ON_PAYMENT_SHEET] = id;
     record[PAYMENT_ID_INDEX_ON_PAYMENT_SHEET] = paymentId;
-    if (!tDate || (tDate && tDate > eDate)) {
+    if (!tDate || (tDate && tDate >= eDate)) {
       record[START_DATE_INDEX_ON_PAYMENT_SHEET] = sDate;
       record[END_DATE_INDEX_ON_PAYMENT_SHEET] = eDate;
       record[REIMBURSEMENT_INDEX_ON_PAYMENT_SHEET] = 'n';
     } else {
-      record[START_DATE_INDEX_ON_PAYMENT_SHEET] = startDate;
-      const reimbursementStartDate = getDate(
-        paidThroughDate.valueOf() + 1000 * 3600 * 24
-      );
+      const reimbursementEndDate = paidThroughDate;
 
       record[START_DATE_INDEX_ON_PAYMENT_SHEET] = tDate;
-      record[END_DATE_INDEX_ON_PAYMENT_SHEET] = reimbursementStartDate;
+      record[END_DATE_INDEX_ON_PAYMENT_SHEET] = reimbursementEndDate;
       record[REIMBURSEMENT_INDEX_ON_PAYMENT_SHEET] = 'y';
     }
     return record;
   });
 
   updatePaymentData(newPaymentRecord, formattedPaymentBreakdownData);
+  onEdit();
 };

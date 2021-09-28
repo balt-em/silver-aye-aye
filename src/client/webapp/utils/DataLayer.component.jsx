@@ -109,19 +109,27 @@ class DataLayer extends React.Component {
     return Math.floor(Math.abs((firstDate - secondDate) / oneDay));
   }
 
+  static getDateDifInclusive(date1, date2) {
+    return DataLayer.getDateDifExclusive(date1, date2) + 1;
+  }
+
   // eslint-disable-next-line class-methods-use-this
   addPaymentRecord(data, rate, companyName, initials, datePaid) {
-    console.log('paymentData', data);
-    console.log('paymentData', rate, companyName, initials, datePaid);
-    serverFunctions.addPaymentRecord(
-      JSON.stringify({
-        paymentBreakdownData: data,
-        rate,
-        companyName,
-        initials,
-        datePaid,
-      })
-    );
+    this.setState({ loaded: false });
+    serverFunctions
+      .addPaymentRecord(
+        JSON.stringify({
+          paymentBreakdownData: data,
+          rate,
+          companyName,
+          initials,
+          datePaid,
+        })
+      )
+      .then(() => {
+        // eslint-disable-next-line no-restricted-globals
+        this.componentDidMount();
+      });
   }
 
   // eslint-disable-next-line class-methods-use-this
