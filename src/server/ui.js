@@ -121,7 +121,9 @@ export const addPaymentRecord = data => {
 
   newPaymentRecord[PAYMENT_ID_INDEX_ON_PAYMENT_OVERVIEW_SHEET] = paymentId;
   newPaymentRecord[RATE_INDEX_ON_PAYMENT_OVERVIEW_SHEET] = rate;
-  newPaymentRecord[DATE_PAID_INDEX_ON_PAYMENT_OVERVIEW_SHEET] = datePaid;
+  newPaymentRecord[DATE_PAID_INDEX_ON_PAYMENT_OVERVIEW_SHEET] = getDate(
+    datePaid
+  );
   newPaymentRecord[PAID_BY_INDEX_ON_PAYMENT_OVERVIEW_SHEET] = initials;
   newPaymentRecord[COMPANY_NAME_INDEX_ON_PAYMENT_OVERVIEW_SHEET] = companyName;
 
