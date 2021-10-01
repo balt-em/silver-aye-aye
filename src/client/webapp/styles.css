@@ -2,6 +2,19 @@
   Elle's custom styles
 */
 
+/* background-color: rgb(104, 54, 149); */
+
+table {
+  position: relative;
+  height: 500px;
+}
+thead tr {
+  background-color: white;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
 #main {
   margin-top: 56px;
   padding: 20px;

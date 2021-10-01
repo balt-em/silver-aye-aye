@@ -55,7 +55,7 @@ class ClientOverviewData extends React.Component {
           data={formattedClientData}
           header={header}
           verticalHeader={true}
-          editable={true}
+          // editable={false}
         ></SaaTable>
       </div>
     );

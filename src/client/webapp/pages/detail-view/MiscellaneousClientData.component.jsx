@@ -43,7 +43,7 @@ class MiscellaneousClientData extends React.Component {
         <h3>Miscellaneous Client Data</h3>
         <SaaTable
           data={formattedClientData}
-          editable={true}
+          // editable={true}
           header={header}
           verticalHeader={true}
         ></SaaTable>

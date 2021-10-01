@@ -85,7 +85,7 @@ function ReactTable(props) {
   const firstPageRows = rows.slice(0, props.maxDisplay);
 
   return (
-    <div>
+    <>
       <GlobalFilter
         preGlobalFilteredRows={preGlobalFilteredRows}
         globalFilter={state.globalFilter}
@@ -145,7 +145,7 @@ function ReactTable(props) {
       <div>
         Showing the first {firstPageRows.length} results of {rows.length} rows
       </div>
-    </div>
+    </>
   );
 }
 
