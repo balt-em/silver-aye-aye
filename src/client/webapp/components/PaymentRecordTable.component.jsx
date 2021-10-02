@@ -9,15 +9,10 @@ import {
 } from '@shared/sheetconfig';
 import PropTypes from 'prop-types';
 import ReactTable from './table/ReactTable.component';
-import EditableCell from './table/EditableCell.component';
+import EditableDateCell from './table/EditableDateCell.component';
 
 class PaymentRecordTable extends React.Component {
   static contextType = DataLayerContext;
-
-  constructor(props) {
-    super(props);
-    this.state = { clientSheetData: [] };
-  }
 
   render() {
     const headers = this.context.clientSheetHeaders;
@@ -27,19 +22,16 @@ class PaymentRecordTable extends React.Component {
       headers[NUMBER_OF_DAYS_OWED_INDEX_ON_CLIENT_SHEET],
       headers[PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET],
       headers[TERMINATION_DATE_INDEX_ON_CLIENT_SHEET],
-      { accessor: 'startDate', Header: 'Start Date', Cell: EditableCell },
-      { accessor: 'endDate', Header: 'End Date', Cell: EditableCell },
+      { accessor: 'startDate', Header: 'Start Date', Cell: EditableDateCell },
+      { accessor: 'endDate', Header: 'End Date', Cell: EditableDateCell },
       {
         accessor: 'terminationDate',
         Header: 'Termination Date',
-        Cell: EditableCell,
+        Cell: EditableDateCell,
       },
       { accessor: 'paid', Header: 'Amount Paid' },
       { accessor: 'reimbursementUsed', Header: 'Reimbursement Used' },
     ];
-
-    // { accessor: `${index}`, Header: header, Cell: EditableCell, }
-    // { index: value }
 
     const { clientSheetData, updateData } = this.props;
 

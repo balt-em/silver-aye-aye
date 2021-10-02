@@ -46,6 +46,8 @@ class PaymentPage extends React.Component {
       const paidThroughDate =
         client[PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET] &&
         getDate(client[PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET]);
+      const reimbursementOwed =
+        client[REIMBURSEMENT_OWED_INDEX_ON_CLIENT_SHEET];
 
       if (!terminationDate) {
         return true;
@@ -56,9 +58,6 @@ class PaymentPage extends React.Component {
       ) {
         return true;
       }
-
-      const reimbursementOwed =
-        client[REIMBURSEMENT_OWED_INDEX_ON_CLIENT_SHEET];
       if (reimbursementOwed) {
         return true;
       }
@@ -81,7 +80,7 @@ class PaymentPage extends React.Component {
       const endDate = terminationDate || getDate();
 
       client.startDate = startDate;
-      client.endDate = startDate > endDate ? undefined : endDate;
+      client.endDate = startDate <= endDate ? endDate : undefined;
       client.terminationDate = terminationDate;
     });
     return clientData;
@@ -92,6 +91,7 @@ class PaymentPage extends React.Component {
       const selectedClients = this.state.clients.filter((_, index) => {
         return rowIds[index];
       });
+      // don't overwrite data already selected
       const editedSelectedClients = selectedClients.map(selectedClient => {
         const updatedClient = this.state.selectedClients.find(
           curSelectedClient => {
@@ -150,9 +150,7 @@ class PaymentPage extends React.Component {
     }
   }
 
-  updateClientData(row, columnId, value, rowId) {
-    // const id = row.values[CLIENT_ID_INDEX_ON_CLIENT_SHEET];
-
+  updateClientData(_, columnId, value, rowId) {
     const newRow = { ...this.state.selectedClients[rowId] };
     newRow[columnId] = value;
 

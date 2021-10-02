@@ -1,5 +1,4 @@
 /* eslint-disable no-unused-vars */
-/* eslint-disable import/first */
 import { CLIENT_NAME_INDEX_ON_INTAKE_FORM } from '@shared/sheetconfig';
 import { getDate } from '@shared/utils';
 

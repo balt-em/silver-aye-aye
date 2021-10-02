@@ -1,7 +1,8 @@
-/* eslint-disable react/display-name */
 /* eslint-disable no-nested-ternary */
-// Normally a good rule, ReactTable adds keys with it's props as long as you add those you should be good
+// Normally a good rule, but ReactTable adds keys with its' props. As long as you add those you should be good
 /* eslint-disable react/jsx-key */
+
+// Much of this code was taken from the React Table documentation: https://react-table.tanstack.com/docs/overview
 import React from 'react';
 import { Table } from 'react-bootstrap';
 import { useTable, useGlobalFilter, useSortBy } from 'react-table';

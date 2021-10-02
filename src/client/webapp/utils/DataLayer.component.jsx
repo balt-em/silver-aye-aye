@@ -113,7 +113,6 @@ class DataLayer extends React.Component {
     return DataLayer.getDateDifExclusive(date1, date2) + 1;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   addPaymentRecord(data, rate, companyName, initials, datePaid) {
     this.setState({ loaded: false });
     serverFunctions
