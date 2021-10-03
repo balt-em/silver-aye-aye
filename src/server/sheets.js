@@ -138,7 +138,6 @@ function updateTotalCosts(
   const clientTotalCostDict = {};
   const clientReimbursementOwedDict = {};
   const reimbursementUsedDict = {};
-  const amountOwedDict = {};
 
   paymentBreakdownData.forEach(row => {
     // calculate the paymentPickUpDate, paidThroughDate while looping through here

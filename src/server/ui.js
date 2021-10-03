@@ -168,12 +168,10 @@ export const addPaymentRecord = data => {
       record[START_DATE_INDEX_ON_PAYMENT_SHEET] = sDate;
       record[END_DATE_INDEX_ON_PAYMENT_SHEET] = eDate;
       record[REIMBURSEMENT_INDEX_ON_PAYMENT_SHEET] = 'n';
-    } else if (
-      terminationDate &&
-      paidThroughDate &&
-      terminationDate < paidThroughDate
-    ) {
-      record[START_DATE_INDEX_ON_PAYMENT_SHEET] = tDate;
+    } else if (tDate && paidThroughDate && tDate < paidThroughDate) {
+      record[START_DATE_INDEX_ON_PAYMENT_SHEET] = getDate(
+        tDate.getTime() + 24 * 60 * 60 * 1000
+      );
       record[END_DATE_INDEX_ON_PAYMENT_SHEET] = paidThroughDate;
       record[REIMBURSEMENT_INDEX_ON_PAYMENT_SHEET] = 'y';
     }
