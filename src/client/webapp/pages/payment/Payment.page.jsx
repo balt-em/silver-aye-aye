@@ -38,40 +38,39 @@ class PaymentPage extends React.Component {
     this.formatClientData = this.formatClientData.bind(this);
   }
 
-  // remove clients who BALT has already finished paying for
-  static filterClients(clientData) {
-    const filteredClientData = clientData.filter(client => {
-      const terminationDate =
-        client[TERMINATION_DATE_INDEX_ON_CLIENT_SHEET] &&
-        getDate(client[TERMINATION_DATE_INDEX_ON_CLIENT_SHEET]);
-      const paidThroughDate =
-        client[PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET] &&
-        getDate(client[PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET]);
-      const reimbursementOwed =
-        client[REIMBURSEMENT_OWED_INDEX_ON_CLIENT_SHEET];
+  // This removes clients who BALT has already finished paying for but that may be too limiting
+  // if the termination date has changed
+  // static filterClients(clientData) {
+  //   const filteredClientData = clientData.filter(client => {
+  //     const terminationDate =
+  //       client[TERMINATION_DATE_INDEX_ON_CLIENT_SHEET] &&
+  //       getDate(client[TERMINATION_DATE_INDEX_ON_CLIENT_SHEET]);
+  //     const paidThroughDate =
+  //       client[PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET] &&
+  //       getDate(client[PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET]);
+  //     const reimbursementOwed =
+  //       client[REIMBURSEMENT_OWED_INDEX_ON_CLIENT_SHEET];
 
-      if (!terminationDate) {
-        return true;
-      }
-      if (
-        terminationDate > paidThroughDate &&
-        DataLayer.getDateDifExclusive(terminationDate, paidThroughDate) > 0
-      ) {
-        return true;
-      }
-      if (reimbursementOwed) {
-        return true;
-      }
-      return false;
-    });
-    return filteredClientData;
-  }
+  //     if (!terminationDate) {
+  //       return true;
+  //     }
+  //     if (
+  //       terminationDate > paidThroughDate &&
+  //       DataLayer.getDateDifExclusive(terminationDate, paidThroughDate) > 0
+  //     ) {
+  //       return true;
+  //     }
+  //     if (reimbursementOwed) {
+  //       return true;
+  //     }
+  //     return false;
+  //   });
+  //   return filteredClientData;
+  // }
 
   componentDidMount() {
     this.setState({
-      clients: this.formatClientData(
-        PaymentPage.filterClients(this.context.clientSheetData)
-      ),
+      clients: this.formatClientData(this.context.clientSheetData),
     });
   }
 

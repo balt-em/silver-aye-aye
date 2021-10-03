@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 /* eslint-disable react/display-name */
 import React from 'react';
 import { useRowSelect } from 'react-table';
@@ -33,19 +32,13 @@ export const selectUseTableFunctions = onClick => [
       // Let's make a column for selection
       {
         id: 'selection',
-        // The header can use the table's getToggleAllRowsSelectedProps method
-        // to render a checkbox
-        // eslint-disable-next-line react/prop-types
-        Header: ({ getToggleAllRowsSelectedProps }) => (
-          <div onClick={() => onClick()}>
-            <IndeterminateCheckbox {...getToggleAllRowsSelectedProps()} />
-          </div>
-        ),
+        Header: () => <div></div>,
         // The cell can use the individual row's getToggleRowSelectedProps method
         // to the render a checkbox
         // eslint-disable-next-line react/prop-types
         Cell: ({ row }) => (
           <div onClick={() => onClick()}>
+            {/* eslint-disable-next-line react/prop-types */}
             <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />
           </div>
         ),
