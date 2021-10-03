@@ -55,7 +55,7 @@ class ClientOverviewData extends React.Component {
           data={formattedClientData}
           header={header}
           verticalHeader={true}
-          editable={true}
+          // editable={false}
         ></SaaTable>
       </div>
     );
@@ -63,6 +63,6 @@ class ClientOverviewData extends React.Component {
 }
 
 ClientOverviewData.propTypes = {
-  clientData: PropTypes.array.isRequired,
+  clientData: PropTypes.object.isRequired,
 };
 export default ClientOverviewData;

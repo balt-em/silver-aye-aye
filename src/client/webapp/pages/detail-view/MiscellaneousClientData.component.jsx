@@ -43,7 +43,7 @@ class MiscellaneousClientData extends React.Component {
         <h3>Miscellaneous Client Data</h3>
         <SaaTable
           data={formattedClientData}
-          editable={true}
+          // editable={true}
           header={header}
           verticalHeader={true}
         ></SaaTable>
@@ -53,6 +53,6 @@ class MiscellaneousClientData extends React.Component {
 }
 
 MiscellaneousClientData.propTypes = {
-  clientData: PropTypes.array.isRequired,
+  clientData: PropTypes.object.isRequired,
 };
 export default MiscellaneousClientData;

@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-vars */
-/* eslint-disable import/first */
-import getRandomValues from 'polyfill-crypto.getrandomvalues';
 import { CLIENT_NAME_INDEX_ON_INTAKE_FORM } from '@shared/sheetconfig';
-import * as indexes from '@shared/sheetconfig';
+import { getDate } from '@shared/utils';
+
+import { v4 as uuidv4 } from 'uuid';
 import {
   getSheets,
   getSheetValues,
@@ -12,13 +12,6 @@ import {
   PAYMENT_BREAKDOWN_SHEET_INDEX,
   PAYMENT_OVERVIEW_SHEET_INDEX,
 } from './sheets';
-
-global.crypto = {
-  getRandomValues,
-};
-
-// eslint-disable-next-line import/order
-import { v4 as uuidv4 } from 'uuid';
 
 const [
   NAME_INDEX_ON_BALT_PAYMENT_SHEET,
@@ -52,13 +45,18 @@ export const onOpen = () => {
   menu.addToUi();
 };
 
-const formatIndividualClientData = (uuid, clientData) => {
+const formatIndividualClientData = (uuid, clientData, matchingAsapRow) => {
   const [submittedOn, clientName, ...remainingIntakeData] = clientData; // <--- SEE ABOVE COMMENT
+  const terminated =
+    matchingAsapRow[STILL_PAYING_INDEX_ON_BALT_PAYMENT_SHEET] === 'No'
+      ? ''
+      : matchingAsapRow[STILL_PAYING_INDEX_ON_BALT_PAYMENT_SHEET];
   return [
     uuid,
     submittedOn,
     clientName,
-    ...Array(7), // leave blank space for calculated columns and termination date
+    ...Array(6), // leave blank space for calculated columns and termination date
+    terminated,
     ...remainingIntakeData,
   ];
 };
@@ -106,7 +104,7 @@ const setClientSheetData = (intakeFormData, clientSheet) => {
 const groupPaymentData = paymentData => {
   const paymentsGroupedByDate = {};
   paymentData.forEach(payment => {
-    const paymentDate = new Date(payment.datePaid);
+    const paymentDate = getDate(payment.datePaid);
     const dateString = `${paymentDate.getMonth() +
       1}/${paymentDate.getDate()}/${paymentDate.getFullYear()}`;
 
@@ -128,7 +126,7 @@ const groupPaymentData = paymentData => {
 
 const matchClientDataWithPaymentData = (intakeFormValues, asapSheetValues) => {
   const matchedValues = [];
-  const asapMap = {};
+  const asapMap = {}; // client Name: last row in ASAP table for that name, sans duplicates
   asapSheetValues.forEach(row => {
     const name = row[NAME_INDEX_ON_BALT_PAYMENT_SHEET];
     if (row[STILL_PAYING_INDEX_ON_BALT_PAYMENT_SHEET] !== 'Duplicate Request') {
@@ -138,15 +136,26 @@ const matchClientDataWithPaymentData = (intakeFormValues, asapSheetValues) => {
   const paymentData = []; // {clientId, startDate, endDate, rate, datePaid, paidBy, Notes}
   const formattedIntakeFormData = [];
 
-  intakeFormValues.forEach(intakeFormRow => {
+  // remove duplicates
+  const seenNameMap = {};
+  const filteredIntakeFormValues = intakeFormValues.filter(intakeFormRow => {
+    const clientName = intakeFormRow[CLIENT_NAME_INDEX_ON_INTAKE_FORM];
+    if (!seenNameMap[clientName]) {
+      seenNameMap[clientName] = true;
+      return true;
+    }
+    return false;
+  });
+
+  filteredIntakeFormValues.forEach(intakeFormRow => {
     const matchingAsapRow =
       asapMap[intakeFormRow[CLIENT_NAME_INDEX_ON_INTAKE_FORM]];
     if (matchingAsapRow) {
-      // if none, it's a duplicate so we won't use it
+      // if none, it's not in the ASAP table or is a duplicate so we won't use it
 
       const clientId = uuidv4();
       formattedIntakeFormData.push(
-        formatIndividualClientData(clientId, intakeFormRow)
+        formatIndividualClientData(clientId, intakeFormRow, matchingAsapRow)
       );
 
       const paymentsForClient = matchingAsapRow.slice(
@@ -181,7 +190,7 @@ const matchClientDataWithPaymentData = (intakeFormValues, asapSheetValues) => {
   Object.keys(groupedPaymentData).forEach(key => {
     const payment = groupedPaymentData[key];
     // Payment Id	Rate/Day	Date Paid	Paid by
-    const formattedPayment = [payment.id, payment.rate, key, payment.paidBy];
+    const formattedPayment = [payment.id, payment.rate, key, payment.paidBy]; // CHANGE IF COLUMN CHANGE
     formattedPaymentOverviewData.push(formattedPayment);
     const { payments } = payment;
     // Client Id	Payment Id	Start Date	End Date	Reimbursement?	Notes

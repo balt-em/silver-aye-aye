@@ -3,7 +3,7 @@ import React from 'react';
 import { DataLayerContext } from '@utils/DataLayer.component';
 import * as indexes from '@shared/sheetconfig';
 import DetailPage from '../detail-view/Detail.page';
-import ReactTable from '../../components/ReactTable.component';
+import ReactTable from '../../components/table/ReactTable.component';
 
 class SearchPage extends React.Component {
   constructor(props) {
@@ -15,10 +15,8 @@ class SearchPage extends React.Component {
 
   static contextType = DataLayerContext;
 
-  clickedClient(id) {
-    const client = this.context.clientSheetData.filter(
-      row => row[indexes.CLIENT_ID_INDEX_ON_CLIENT_SHEET] === id
-    )[0];
+  clickedClient(index) {
+    const client = this.context.clientSheetData[index];
     this.setState(() => ({
       curClient: client, // don't include header
       showModal: true,
@@ -48,6 +46,7 @@ class SearchPage extends React.Component {
           columns={clientSheetHeaders}
           data={clientSheetData}
           clickedRow={this.clickedClient}
+          maxDisplay={100}
         />
       </div>
     );

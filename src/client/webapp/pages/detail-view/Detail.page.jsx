@@ -67,7 +67,7 @@ class DetailPage extends React.Component {
 
 DetailPage.propTypes = {
   show: PropTypes.bool.isRequired,
-  clientData: PropTypes.array.isRequired,
+  clientData: PropTypes.object.isRequired,
   setModal: PropTypes.func.isRequired,
 };
 

@@ -15,7 +15,11 @@ import {
   START_DATE_INDEX_ON_PAYMENT_SHEET,
   END_DATE_INDEX_ON_PAYMENT_SHEET,
   REIMBURSEMENT_INDEX_ON_PAYMENT_SHEET,
+  PAYMENT_ID_INDEX_ON_PAYMENT_OVERVIEW_SHEET,
+  RATE_INDEX_ON_PAYMENT_OVERVIEW_SHEET,
+  TOTAL_INDEX_ON_PAYMENT_OVERVIEW_SHEET,
 } from '@shared/sheetconfig';
+import { getDate } from '@shared/utils';
 
 export const [
   INTAKE_FORM_SHEET_INDEX,
@@ -24,14 +28,6 @@ export const [
   PAYMENT_OVERVIEW_SHEET_INDEX,
 ] = [...Array(4).keys()];
 
-const [
-  paymentIdIndexOnPaymentOverview,
-  rateIndexOnPaymentOverview,
-  datePaidIndexOnPaymentOverview,
-  paidByIndexOnPaymentOverview,
-  reciptUrlIndexOnPaymentOverview,
-  totalIndexOnPaymentOverview,
-] = [...Array(6).keys()];
 // TODO we need to figure out a better way to assigned sequential numbers for our rows
 const spreadsheetUrl =
   'https://docs.google.com/spreadsheets/d/1wyPjcdA8DVUeCbyYCanyOaBxcv_YlJK8WIrPnQ0JeOk/edit#gid=518849693';
@@ -99,8 +95,8 @@ function updateTotalCosts(
   const paymentRateDict = {};
 
   paymentOverviewData.forEach(row => {
-    paymentRateDict[row[paymentIdIndexOnPaymentOverview]] =
-      row[rateIndexOnPaymentOverview];
+    paymentRateDict[row[PAYMENT_ID_INDEX_ON_PAYMENT_OVERVIEW_SHEET]] =
+      row[RATE_INDEX_ON_PAYMENT_OVERVIEW_SHEET];
   });
 
   const paymentPickupDateDict = {};
@@ -142,15 +138,14 @@ function updateTotalCosts(
   const clientTotalCostDict = {};
   const clientReimbursementOwedDict = {};
   const reimbursementUsedDict = {};
-  const amountOwedDict = {};
 
   paymentBreakdownData.forEach(row => {
     // calculate the paymentPickUpDate, paidThroughDate while looping through here
     const clientId = row[CLIENT_ID_INDEX_ON_PAYMENT_SHEET];
     const terminationDate = clientTerminationDateDict[clientId];
     const paymentId = row[PAYMENT_ID_INDEX_ON_PAYMENT_SHEET];
-    const startDate = new Date(row[START_DATE_INDEX_ON_PAYMENT_SHEET]);
-    const endDate = new Date(row[END_DATE_INDEX_ON_PAYMENT_SHEET]);
+    const startDate = getDate(row[START_DATE_INDEX_ON_PAYMENT_SHEET]);
+    const endDate = getDate(row[END_DATE_INDEX_ON_PAYMENT_SHEET]);
     const reimbursement = row[REIMBURSEMENT_INDEX_ON_PAYMENT_SHEET];
 
     const inclusiveDateDif = getDateDifInclusive(startDate, endDate);
@@ -197,7 +192,7 @@ function updateTotalCosts(
   clientData.forEach(row => {
     const clientId = row[CLIENT_ID_INDEX_ON_CLIENT_SHEET];
     const terminationDate = clientTerminationDateDict[clientId];
-    const paymentDueThroughDate = terminationDate || new Date();
+    const paymentDueThroughDate = terminationDate || getDate();
     const paidThroughDate = paidThroughDateDict[clientId];
     // don't want to include the date you paid through
     const dateDif = getDateDifExclusive(paymentDueThroughDate, paidThroughDate);
@@ -230,8 +225,8 @@ function updateTotalCosts(
     paymentOverviewSheet,
     paymentOverviewSheetDataRange,
     paymentTotalCostDict,
-    paymentIdIndexOnPaymentOverview,
-    totalIndexOnPaymentOverview
+    PAYMENT_ID_INDEX_ON_PAYMENT_OVERVIEW_SHEET,
+    TOTAL_INDEX_ON_PAYMENT_OVERVIEW_SHEET
   );
 
   updateColumnFromDictionary(
@@ -285,7 +280,7 @@ function getClientTerminationDateDict(clientData) {
     const terminationDate = row[TERMINATION_DATE_INDEX_ON_CLIENT_SHEET];
     if (terminationDate) {
       const clientId = row[CLIENT_ID_INDEX_ON_CLIENT_SHEET];
-      clientTerminationDateDict[clientId] = new Date(terminationDate);
+      clientTerminationDateDict[clientId] = getDate(terminationDate);
     }
   });
 
@@ -334,6 +329,24 @@ export const getClientSheet = () => {
   return clientSheet.getDataRange().getValues();
 };
 
+export const updatePaymentData = (paymentOverviewRow, paymentBreakdownData) => {
+  const sheets = getSheets(true);
+  const paymentOverviewSheet = sheets[PAYMENT_OVERVIEW_SHEET_INDEX];
+  const paymentBreakdownSheet = sheets[PAYMENT_BREAKDOWN_SHEET_INDEX];
+
+  paymentOverviewSheet.appendRow(paymentOverviewRow);
+
+  const lastRow = paymentBreakdownSheet.getLastRow();
+  const dataRange = paymentBreakdownSheet.getRange(
+    lastRow + 1,
+    1,
+    paymentBreakdownData.length,
+    paymentBreakdownData[0].length
+  );
+  dataRange.setValues(paymentBreakdownData);
+  // return clientSheet.getDataRange().getValues();
+};
+
 export const getSheet = (index, useUrl) => {
   return getSheets(useUrl)[index];
 };
@@ -354,6 +367,14 @@ export const setSheetValues = (sheet, formattedData) => {
   );
 
   dataRange.setValues(formattedData);
+};
+
+export const setSheetRow = (sheet, index, data) => {
+  const dataRange = sheet.getRange(index + 1, 1, 1, data.length);
+  console.log('index + 1, 1, 1, data.length', index + 1, 1, 1, data.length);
+  console.log('data', data);
+
+  dataRange.setValues([data]);
 };
 
 export const getPaymentSheetValues = () => {

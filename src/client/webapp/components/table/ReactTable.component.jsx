@@ -1,12 +1,15 @@
 /* eslint-disable no-nested-ternary */
-// Normally a good rule, ReactTable adds keys with it's props as long as you add those you should be good
+// Normally a good rule, but ReactTable adds keys with its' props. As long as you add those you should be good
 /* eslint-disable react/jsx-key */
+
+// Much of this code was taken from the React Table documentation: https://react-table.tanstack.com/docs/overview
 import React from 'react';
 import { Table } from 'react-bootstrap';
 import { useTable, useGlobalFilter, useSortBy } from 'react-table';
 import PropTypes from 'prop-types';
 
-import { CLIENT_ID_INDEX_ON_CLIENT_SHEET } from '@shared/sheetconfig';
+import Cell from './Cell.component';
+import { selectUseTableFunctions } from './IndeterminateCheckbox.component';
 
 function GlobalFilter({
   preGlobalFilteredRows,
@@ -31,6 +34,7 @@ function GlobalFilter({
         placeholder={`${count} records...`}
         style={{
           fontSize: '1.1rem',
+          marginBottom: '10px',
         }}
       />
     </span>
@@ -39,14 +43,27 @@ function GlobalFilter({
 
 GlobalFilter.propTypes = {
   preGlobalFilteredRows: PropTypes.array,
-  globalFilter: PropTypes.object,
   setGlobalFilter: PropTypes.func,
+  globalFilter: PropTypes.string,
 };
 
+const defaultColumn = {
+  Cell,
+};
 function ReactTable(props) {
-  const data = React.useMemo(() => props.data, []);
+  const data = React.useMemo(() => props.data, [props.data]);
 
   const columns = React.useMemo(() => props.columns, []);
+
+  const useTableArgs = [
+    { columns, data, defaultColumn, updateData: props.updateData },
+    useGlobalFilter,
+    useSortBy,
+  ];
+
+  if (props.onSelect) {
+    useTableArgs.push(...selectUseTableFunctions(props.onSelect));
+  }
 
   const {
     getTableProps,
@@ -57,12 +74,19 @@ function ReactTable(props) {
     state,
     preGlobalFilteredRows,
     setGlobalFilter,
-  } = useTable({ columns, data }, useGlobalFilter, useSortBy);
+    state: { selectedRowIds },
+  } = useTable(...useTableArgs);
 
-  const firstPageRows = rows.slice(0, 50);
+  if (props.onSelect) {
+    React.useEffect(() => {
+      props.onSelect(selectedRowIds);
+    }, [selectedRowIds]);
+  }
+
+  const firstPageRows = rows.slice(0, props.maxDisplay);
 
   return (
-    <div>
+    <>
       <GlobalFilter
         preGlobalFilteredRows={preGlobalFilteredRows}
         globalFilter={state.globalFilter}
@@ -74,7 +98,7 @@ function ReactTable(props) {
         hover
         {...getTableProps()}
         style={{
-          width: '95vw',
+          width: '100%',
           overflowX: 'auto',
           display: 'block',
         }}
@@ -105,11 +129,7 @@ function ReactTable(props) {
             return (
               <tr
                 {...row.getRowProps()}
-                onClick={() =>
-                  props.clickedRow(
-                    row.cells[CLIENT_ID_INDEX_ON_CLIENT_SHEET].value
-                  )
-                }
+                onClick={() => props.clickedRow(row.index)}
               >
                 {row.cells.map(cell => {
                   return (
@@ -126,14 +146,21 @@ function ReactTable(props) {
       <div>
         Showing the first {firstPageRows.length} results of {rows.length} rows
       </div>
-    </div>
+    </>
   );
 }
 
 ReactTable.propTypes = {
   clickedRow: PropTypes.func,
+  onSelect: PropTypes.func,
   columns: PropTypes.array,
   data: PropTypes.array,
+  maxDisplay: PropTypes.number,
+  updateData: PropTypes.func,
+};
+
+ReactTable.defaultProps = {
+  clickedRow: () => undefined,
 };
 
 export default ReactTable;

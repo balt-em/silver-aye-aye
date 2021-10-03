@@ -1,5 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {
+  CLIENT_ID_INDEX_ON_CLIENT_SHEET,
+  CLIENT_HOOK_UP_DATE_INDEX_ON_CLIENT_SHEET,
+  CLIENTS_NEXT_COURT_DATE_INDEX_ON_CLIENT_SHEET,
+  CLIENTS_DATE_OF_BIRTH_INDEX_ON_CLIENT_SHEET,
+  TERMINATION_DATE_INDEX_ON_CLIENT_SHEET,
+  PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET,
+  SUBMITTED_ON_INDEX_ON_CLIENT_SHEET,
+  RESCHEULED_COURT_DATE_INDEX_ON_CLIENT_SHEET,
+  PAYMENT_PICKUP_DATE_INDEX_ON_CLIENT_SHEET,
+} from '@shared/sheetconfig';
+import { getDate } from '@shared/utils';
 import server from './server';
 
 const { serverFunctions } = server;
@@ -7,6 +19,7 @@ const { serverFunctions } = server;
 export const DataLayerContext = React.createContext({
   getClientPaymentData: () => 'not implemented',
   updateClientData: () => 'not implemented',
+  addPaymentRecord: () => 'not implemented',
   totals: {},
   clientSheetHeaders: [],
   clientSheetData: [],
@@ -24,6 +37,7 @@ class DataLayer extends React.Component {
       clientSheetData: [],
     };
     this.updateClientData = this.updateClientData.bind(this);
+    this.addPaymentRecord = this.addPaymentRecord.bind(this);
     this.getClientPaymentData = this.getClientPaymentData.bind(this);
   }
 
@@ -36,14 +50,30 @@ class DataLayer extends React.Component {
         const clientSheetHeaders = headers.map((header, index) => {
           return { accessor: `${index}`, Header: header };
         });
+        const dateFields = [
+          RESCHEULED_COURT_DATE_INDEX_ON_CLIENT_SHEET,
+          PAYMENT_PICKUP_DATE_INDEX_ON_CLIENT_SHEET,
+          CLIENT_HOOK_UP_DATE_INDEX_ON_CLIENT_SHEET,
+          CLIENTS_NEXT_COURT_DATE_INDEX_ON_CLIENT_SHEET,
+          CLIENTS_DATE_OF_BIRTH_INDEX_ON_CLIENT_SHEET,
+          TERMINATION_DATE_INDEX_ON_CLIENT_SHEET,
+          PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET,
+          SUBMITTED_ON_INDEX_ON_CLIENT_SHEET,
+        ];
         const clientSheetData = rows.map(row => {
           const rowMap = {};
           row.forEach((field, index) => {
-            rowMap[index] = field;
+            if (dateFields.includes(index) && field) {
+              rowMap[index] = getDate(field);
+            } else if (dateFields.includes(index)) {
+              rowMap[index] = undefined;
+            } else {
+              rowMap[index] = field;
+            }
           });
+          rowMap.id = row[CLIENT_ID_INDEX_ON_CLIENT_SHEET];
           return rowMap;
         });
-        console.log('totals', totals);
 
         this.setState(() => ({
           clientSheetData,
@@ -66,7 +96,39 @@ class DataLayer extends React.Component {
   }
 
   static getReadableDate(dateString) {
-    return dateString ? new Date(dateString).toLocaleDateString() : 'N/A';
+    return dateString ? getDate(dateString).toLocaleDateString() : 'N/A';
+  }
+
+  // https://stackoverflow.com/questions/2627473/how-to-calculate-the-number-of-days-between-two-dates
+  // the difference between two dates including the start OR the end date: 1/1 - 1/1 is 0 days
+  static getDateDifExclusive(date1, date2) {
+    const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
+    const firstDate = date1;
+    const secondDate = date2;
+
+    return Math.floor(Math.abs((firstDate - secondDate) / oneDay));
+  }
+
+  static getDateDifInclusive(date1, date2) {
+    return DataLayer.getDateDifExclusive(date1, date2) + 1;
+  }
+
+  addPaymentRecord(data, rate, companyName, initials, datePaid) {
+    this.setState({ loaded: false });
+    serverFunctions
+      .addPaymentRecord(
+        JSON.stringify({
+          paymentBreakdownData: data,
+          rate,
+          companyName,
+          initials,
+          datePaid,
+        })
+      )
+      .then(() => {
+        // eslint-disable-next-line no-restricted-globals
+        this.componentDidMount();
+      });
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -88,6 +150,7 @@ class DataLayer extends React.Component {
       totals: this.state.totals,
       getClientPaymentData: this.getClientPaymentData,
       updateClientData: this.updateClientData,
+      addPaymentRecord: this.addPaymentRecord,
     };
 
     return (

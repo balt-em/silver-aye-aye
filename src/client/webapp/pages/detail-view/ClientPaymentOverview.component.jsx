@@ -53,6 +53,6 @@ class ClientPaymentOverview extends React.Component {
 }
 
 ClientPaymentOverview.propTypes = {
-  clientData: PropTypes.array.isRequired,
+  clientData: PropTypes.object.isRequired,
 };
 export default ClientPaymentOverview;

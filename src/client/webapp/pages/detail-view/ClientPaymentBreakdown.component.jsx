@@ -49,6 +49,6 @@ class ClientPaymentBreakdown extends React.Component {
 }
 
 ClientPaymentBreakdown.propTypes = {
-  clientId: PropTypes.number.isRequired,
+  clientId: PropTypes.string.isRequired,
 };
 export default ClientPaymentBreakdown;
