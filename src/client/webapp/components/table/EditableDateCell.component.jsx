@@ -15,7 +15,7 @@ const EditableDateCell = ({
     updateData(row, id, val, row.id);
   };
 
-  return <ReactDatePicker selected={value} onChange={onChange} />;
+  return <ReactDatePicker selected={value} onChange={onChange} isClearable />;
 };
 
 EditableDateCell.propTypes = {

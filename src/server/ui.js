@@ -1,6 +1,8 @@
 import { v4 as uuid } from 'uuid';
 import * as indexes from '@shared/sheetconfig';
 import {
+  CLIENT_ID_INDEX_ON_CLIENT_SHEET,
+  TERMINATION_DATE_INDEX_ON_CLIENT_SHEET,
   CLIENT_ID_INDEX_ON_PAYMENT_SHEET,
   PAYMENT_ID_INDEX_ON_PAYMENT_SHEET,
   START_DATE_INDEX_ON_PAYMENT_SHEET,
@@ -20,10 +22,13 @@ import {
 } from '@shared/sheetconfig';
 import { getDate } from '@shared/utils';
 import {
+  CLIENT_SHEET_INDEX,
   getClientSheet,
   getPaymentSheetValues,
   onEdit,
   updatePaymentData,
+  getSheet,
+  setSheetRow,
 } from './sheets';
 
 // eslint-disable-next-line import/prefer-default-export
@@ -108,6 +113,24 @@ export const getClientPaymentData = () => {
   return JSON.stringify(clientPaymentData);
 };
 
+export const updateClientData = clients => {
+  const clientSheet = getSheet(CLIENT_SHEET_INDEX);
+  const clientSheetValues = clientSheet.getDataRange().getValues();
+  const clientSheetIndexMap = {};
+  clientSheetValues.forEach((client, index) => {
+    clientSheetIndexMap[client[CLIENT_ID_INDEX_ON_CLIENT_SHEET]] = index;
+  });
+  clients.forEach(client => {
+    const clientId = client[CLIENT_ID_INDEX_ON_CLIENT_SHEET];
+    const indexOnClientSheet = clientSheetIndexMap[clientId];
+    const currentRow = clientSheetValues[indexOnClientSheet];
+    currentRow[TERMINATION_DATE_INDEX_ON_CLIENT_SHEET] = getDate(
+      client.terminationDate
+    );
+    setSheetRow(clientSheet, indexOnClientSheet, currentRow);
+  });
+};
+
 export const addPaymentRecord = data => {
   const {
     paymentBreakdownData,
@@ -116,10 +139,12 @@ export const addPaymentRecord = data => {
     initials,
     datePaid,
   } = JSON.parse(data);
+  updateClientData(paymentBreakdownData);
+
   const sheetValues = getPaymentSheetValues();
-  const newPaymentRecord = Array(sheetValues[0].length);
   const paymentId = uuid();
 
+  const newPaymentRecord = Array(sheetValues[0].length);
   newPaymentRecord[PAYMENT_ID_INDEX_ON_PAYMENT_OVERVIEW_SHEET] = paymentId;
   newPaymentRecord[RATE_INDEX_ON_PAYMENT_OVERVIEW_SHEET] = rate;
   newPaymentRecord[DATE_PAID_INDEX_ON_PAYMENT_OVERVIEW_SHEET] = getDate(
@@ -130,24 +155,26 @@ export const addPaymentRecord = data => {
 
   const formattedPaymentBreakdownData = paymentBreakdownData.map(client => {
     const { startDate, endDate, id, terminationDate } = client;
-    const paidThroughDate = getDate(
-      client[PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET]
-    );
-    const eDate = getDate(endDate);
-    const sDate = getDate(startDate);
+    const paidThroughDate =
+      client[PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET] &&
+      getDate(client[PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET]);
+    const eDate = endDate && getDate(endDate);
+    const sDate = endDate && getDate(startDate);
     const tDate = terminationDate && getDate(terminationDate);
     const record = Array(5);
     record[CLIENT_ID_INDEX_ON_PAYMENT_SHEET] = id;
     record[PAYMENT_ID_INDEX_ON_PAYMENT_SHEET] = paymentId;
-    if (!tDate || (tDate && tDate >= eDate)) {
+    if (startDate && endDate) {
       record[START_DATE_INDEX_ON_PAYMENT_SHEET] = sDate;
       record[END_DATE_INDEX_ON_PAYMENT_SHEET] = eDate;
       record[REIMBURSEMENT_INDEX_ON_PAYMENT_SHEET] = 'n';
-    } else {
-      const reimbursementEndDate = paidThroughDate;
-
+    } else if (
+      terminationDate &&
+      paidThroughDate &&
+      terminationDate < paidThroughDate
+    ) {
       record[START_DATE_INDEX_ON_PAYMENT_SHEET] = tDate;
-      record[END_DATE_INDEX_ON_PAYMENT_SHEET] = reimbursementEndDate;
+      record[END_DATE_INDEX_ON_PAYMENT_SHEET] = paidThroughDate;
       record[REIMBURSEMENT_INDEX_ON_PAYMENT_SHEET] = 'y';
     }
     return record;

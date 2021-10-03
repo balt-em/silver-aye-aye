@@ -370,6 +370,14 @@ export const setSheetValues = (sheet, formattedData) => {
   dataRange.setValues(formattedData);
 };
 
+export const setSheetRow = (sheet, index, data) => {
+  const dataRange = sheet.getRange(index + 1, 1, 1, data.length);
+  console.log('index + 1, 1, 1, data.length', index + 1, 1, 1, data.length);
+  console.log('data', data);
+
+  dataRange.setValues([data]);
+};
+
 export const getPaymentSheetValues = () => {
   const clientSheet = getSheets(true)[PAYMENT_BREAKDOWN_SHEET_INDEX];
   return clientSheet

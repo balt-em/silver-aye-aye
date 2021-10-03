@@ -35,6 +35,7 @@ class PaymentPage extends React.Component {
     this.updateData = this.updateData.bind(this);
     this.updateClientData = this.updateClientData.bind(this);
     this.updateCalculatedValues = this.updateCalculatedValues.bind(this);
+    this.formatClientData = this.formatClientData.bind(this);
   }
 
   // remove clients who BALT has already finished paying for
@@ -66,7 +67,15 @@ class PaymentPage extends React.Component {
     return filteredClientData;
   }
 
-  static formatClientData(clientData) {
+  componentDidMount() {
+    this.setState({
+      clients: this.formatClientData(
+        PaymentPage.filterClients(this.context.clientSheetData)
+      ),
+    });
+  }
+
+  formatClientData(clientData) {
     clientData.forEach(client => {
       const paidThroughDate = client[PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET];
       const terminationDate = client[TERMINATION_DATE_INDEX_ON_CLIENT_SHEET];
@@ -83,6 +92,9 @@ class PaymentPage extends React.Component {
       client.endDate = startDate <= endDate ? endDate : undefined;
       client.terminationDate = terminationDate;
     });
+
+    this.updateCalculatedValues(clientData);
+
     return clientData;
   }
 
@@ -100,7 +112,7 @@ class PaymentPage extends React.Component {
         );
         return updatedClient || selectedClient;
       });
-
+      console.log('editedSelectedClients', editedSelectedClients);
       this.setState(() => ({
         selectedClients: editedSelectedClients,
       }));
@@ -110,14 +122,6 @@ class PaymentPage extends React.Component {
   updateData(val, valToUpdate) {
     this.setState({
       [valToUpdate]: val,
-    });
-  }
-
-  componentDidMount() {
-    this.setState({
-      clients: PaymentPage.formatClientData(
-        PaymentPage.filterClients(this.context.clientSheetData)
-      ),
     });
   }
 
@@ -131,30 +135,35 @@ class PaymentPage extends React.Component {
     );
   }
 
-  updateCalculatedValues(client) {
-    const { startDate, endDate, terminationDate } = client;
-    if (!terminationDate || (terminationDate && terminationDate >= endDate)) {
-      const cost =
-        DataLayer.getDateDifInclusive(startDate, endDate) * this.state.rate;
-      client.reimbursementUsed = '';
-      client.paid = `$${cost}`;
-    } else {
-      const reimbursementEndDate =
-        client[PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET];
-
-      const reimbursement =
-        DataLayer.getDateDifExclusive(reimbursementEndDate, terminationDate) *
-        this.state.rate; // TODO: should use OLD rate
-      client.reimbursementUsed = `$${reimbursement}`;
+  updateCalculatedValues(clientData) {
+    clientData.forEach(client => {
+      const { startDate, endDate, terminationDate } = client;
+      const paidThroughDate = client[PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET];
       client.paid = '';
-    }
+      client.reimbursementUsed = '';
+
+      if (startDate && endDate) {
+        const cost =
+          DataLayer.getDateDifInclusive(startDate, endDate) * this.state.rate;
+        client.paid = `$${cost}`;
+      } else if (
+        terminationDate &&
+        paidThroughDate &&
+        terminationDate < paidThroughDate
+      ) {
+        const reimbursement =
+          DataLayer.getDateDifExclusive(paidThroughDate, terminationDate) *
+          this.state.rate; // TODO: should use OLD rate
+        client.reimbursementUsed = `$${reimbursement}`;
+      }
+    });
   }
 
   updateClientData(_, columnId, value, rowId) {
     const newRow = { ...this.state.selectedClients[rowId] };
     newRow[columnId] = value;
 
-    this.updateCalculatedValues(newRow);
+    this.updateCalculatedValues([newRow]);
     const updatedSelectedClients = [
       ...this.state.selectedClients.slice(0, rowId),
       newRow,

@@ -9,6 +9,9 @@ export const getDate = dateString => {
 };
 
 export const normalizeDate = date => {
+  if (!date) {
+    return date;
+  }
   date.setUTCHours(16); // noon in Baltimore
   date.setMinutes(0);
   date.setMilliseconds(0);
