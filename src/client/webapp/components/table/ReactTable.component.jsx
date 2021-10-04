@@ -102,6 +102,7 @@ function ReactTable(props) {
           overflowX: 'auto',
           display: 'block',
         }}
+        className={'scrollable-table'}
       >
         <thead>
           {headerGroups.map(headerGroup => (

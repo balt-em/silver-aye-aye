@@ -4,15 +4,19 @@
 
 /* background-color: rgb(104, 54, 149); */
 
-table {
+.scrollable-table {
   position: relative;
   height: 500px;
 }
-thead tr {
+.scrollable-table thead tr {
   background-color: white;
   position: sticky;
   top: 0;
   z-index: 1;
+}
+
+.vertical-table .scrollable {
+  max-height: 45px;
 }
 
 #main {

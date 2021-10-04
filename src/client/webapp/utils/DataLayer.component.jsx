@@ -13,6 +13,7 @@ import {
 } from '@shared/sheetconfig';
 import { getDate } from '@shared/utils';
 import server from './server';
+import EditableDateCell from '../components/table/EditableDateCell.component';
 
 const { serverFunctions } = server;
 
@@ -47,9 +48,6 @@ class DataLayer extends React.Component {
       .then(data => {
         const { clientData, totals } = JSON.parse(data);
         const [headers, ...rows] = clientData;
-        const clientSheetHeaders = headers.map((header, index) => {
-          return { accessor: `${index}`, Header: header };
-        });
         const dateFields = [
           RESCHEULED_COURT_DATE_INDEX_ON_CLIENT_SHEET,
           PAYMENT_PICKUP_DATE_INDEX_ON_CLIENT_SHEET,
@@ -60,6 +58,13 @@ class DataLayer extends React.Component {
           PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET,
           SUBMITTED_ON_INDEX_ON_CLIENT_SHEET,
         ];
+        const clientSheetHeaders = headers.map((header, index) => {
+          const tableHeader = { accessor: `${index}`, Header: header };
+          if (dateFields.includes(index)) {
+            tableHeader.EditableCell = EditableDateCell;
+          }
+          return tableHeader;
+        });
         const clientSheetData = rows.map(row => {
           const rowMap = {};
           row.forEach((field, index) => {
