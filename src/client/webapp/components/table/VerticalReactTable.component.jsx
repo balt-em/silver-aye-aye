@@ -1,4 +1,3 @@
-/* eslint-disable no-nested-ternary */
 // Normally a good rule, but VerticalReactTable adds keys with its' props. As long as you add those you should be good
 /* eslint-disable react/jsx-key */
 
@@ -18,9 +17,11 @@ const defaultColumn = {
 function VerticalReactTable(props) {
   const [editMode, setEditMode] = useState(false);
 
-  const save = () => {
-    setEditMode(false);
-    props.onSave();
+  const save = newEditMode => {
+    setEditMode(newEditMode);
+    if (newEditMode === false) {
+      props.onSave();
+    }
   };
 
   const data = React.useMemo(() => props.data, [props.data]);
@@ -39,21 +40,13 @@ function VerticalReactTable(props) {
 
   return (
     <div className="table-wrapper">
-      {props.editable && editMode ? (
+      {props.editable && (
         <Button
           style={{ float: 'right', marginBottom: '5px' }}
           variant="primary"
-          onClick={save}
+          onClick={() => save(!editMode)}
         >
-          Save
-        </Button>
-      ) : (
-        <Button
-          style={{ float: 'right', marginBottom: '5px' }}
-          variant="primary"
-          onClick={() => setEditMode(true)}
-        >
-          Edit
+          {editMode ? 'Save' : 'Edit'}
         </Button>
       )}
       <Table
