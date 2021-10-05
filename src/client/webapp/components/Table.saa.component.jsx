@@ -21,7 +21,6 @@ class SaaTable extends React.Component {
 
   render() {
     const { header, data } = this.props;
-    console.log('this.state.editMode', this.state.editMode);
 
     const tableBody = data.map((row, i) => (
       <tr key={i} onClick={() => this.props.clickedRow(i)}>
