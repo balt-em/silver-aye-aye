@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import * as indexes from '@shared/sheetconfig';
 import { DataLayerContext } from '@utils/DataLayer.component';
 import VerticalReactTable from '../../components/table/VerticalReactTable.component';
-import EditableDateCell from '../../components/table/EditableDateCell.component';
 
 class ClientOverviewData extends React.Component {
   static contextType = DataLayerContext;
@@ -27,7 +26,7 @@ class ClientOverviewData extends React.Component {
   }
 
   onSave() {
-    console.log('this.state.formattedData', this.state.clientData);
+    this.context.updateClientData(this.state.clientData);
   }
 
   render() {

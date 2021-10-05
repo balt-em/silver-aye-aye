@@ -38,7 +38,7 @@ class ClientPaymentBreakdown extends React.Component {
     });
     return (
       <div>
-        <h3>Client Payment Overview</h3>
+        <h3>Client Payment Breakdown</h3>
         <SaaTable
           header={ClientPaymentBreakdown.header}
           data={formattedPaymentData}

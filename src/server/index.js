@@ -14,6 +14,7 @@ global.doGet = publicUiFunctions.doGet;
 global.getClientPaymentData = publicUiFunctions.getClientPaymentData;
 global.getTotalsAndClientData = publicUiFunctions.getTotalsAndClientData;
 global.addPaymentRecord = publicUiFunctions.addPaymentRecord;
+global.updateClientData = publicUiFunctions.updateClientData;
 
 global.onOpen = publicMigrationFunctions.onOpen;
 global.migrateData = publicMigrationFunctions.migrateData;

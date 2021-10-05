@@ -139,6 +139,7 @@ class DataLayer extends React.Component {
   // eslint-disable-next-line class-methods-use-this
   updateClientData(data) {
     console.log('called updateData callback', data);
+    serverFunctions.updateClientData(JSON.stringify(data));
   }
 
   getClientPaymentData(clientId) {

@@ -15,7 +15,6 @@ class ClientPaymentOverview extends React.Component {
       'Date Paid Through',
       'Reimbursement Owed',
       'Reimbursement Used',
-      'Termination Date',
     ];
 
     const formattedClientData = [
@@ -33,11 +32,6 @@ class ClientPaymentOverview extends React.Component {
       ],
       [clientData[indexes.REIMBURSEMENT_OWED_INDEX_ON_CLIENT_SHEET]],
       [clientData[indexes.REIMBURSEMENT_USED_INDEX_ON_CLIENT_SHEET]],
-      [
-        DataLayer.getReadableDate(
-          clientData[indexes.TERMINATION_DATE_INDEX_ON_CLIENT_SHEET]
-        ),
-      ],
     ];
     return (
       <div>

@@ -114,19 +114,33 @@ export const getClientPaymentData = () => {
 };
 
 export const updateClientData = clients => {
+  const clientsData =
+    typeof clients === 'string' ? [JSON.parse(clients)] : clients;
   const clientSheet = getSheet(CLIENT_SHEET_INDEX);
   const clientSheetValues = clientSheet.getDataRange().getValues();
   const clientSheetIndexMap = {};
   clientSheetValues.forEach((client, index) => {
     clientSheetIndexMap[client[CLIENT_ID_INDEX_ON_CLIENT_SHEET]] = index;
   });
-  clients.forEach(client => {
+  clientsData.forEach(client => {
     const clientId = client[CLIENT_ID_INDEX_ON_CLIENT_SHEET];
     const indexOnClientSheet = clientSheetIndexMap[clientId];
     const currentRow = clientSheetValues[indexOnClientSheet];
-    currentRow[TERMINATION_DATE_INDEX_ON_CLIENT_SHEET] = getDate(
-      client.terminationDate
-    );
+    currentRow.forEach((value, index) => {
+      if (indexes.dateFields.includes(index)) {
+        currentRow[index] = getDate(client[index]);
+      } else {
+        currentRow[index] = client[index];
+      }
+    });
+
+    // TODO: replace this so don't manually override terminationdate
+    if (client.terminationDate) {
+      currentRow[TERMINATION_DATE_INDEX_ON_CLIENT_SHEET] = getDate(
+        client.terminationDate
+      );
+    }
+    console.log('currentRow', currentRow);
     setSheetRow(clientSheet, indexOnClientSheet, currentRow);
   });
 };
