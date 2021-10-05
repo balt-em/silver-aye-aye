@@ -2,6 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Table, Button, Form } from 'react-bootstrap';
 
+// Elle switched to using react table from this to make editing cells easier
+// This works just fine in the detail view, so it's not switched,
+// but if getting more complex I'd recommend switching off this entirely
+
 class SaaTable extends React.Component {
   constructor(props) {
     super(props);
@@ -17,7 +21,6 @@ class SaaTable extends React.Component {
 
   render() {
     const { header, data } = this.props;
-    console.log('this.state.editMode', this.state.editMode);
 
     const tableBody = data.map((row, i) => (
       <tr key={i} onClick={() => this.props.clickedRow(i)}>

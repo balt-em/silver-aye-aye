@@ -34,16 +34,16 @@ class DetailPage extends React.Component {
               ></ClientOverviewData>
             </div>
             <div className="col-6">
-              <ClientPaymentOverview
+              <MiscellaneousClientData
                 clientData={this.props.clientData}
-              ></ClientPaymentOverview>
+              ></MiscellaneousClientData>
             </div>
           </div>
           <div className="row">
             <div className="col-9">
-              <MiscellaneousClientData
+              <ClientPaymentOverview
                 clientData={this.props.clientData}
-              ></MiscellaneousClientData>
+              ></ClientPaymentOverview>
             </div>
             <div className="col-3">
               <h3>Notes</h3>
