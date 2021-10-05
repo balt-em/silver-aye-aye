@@ -21,6 +21,7 @@ export const DataLayerContext = React.createContext({
   getClientPaymentData: () => 'not implemented',
   updateClientData: () => 'not implemented',
   addPaymentRecord: () => 'not implemented',
+  removeDuplicate: () => 'not implemented',
   totals: {},
   clientSheetHeaders: [],
   clientSheetData: [],
@@ -40,7 +41,22 @@ class DataLayer extends React.Component {
     this.updateClientData = this.updateClientData.bind(this);
     this.addPaymentRecord = this.addPaymentRecord.bind(this);
     this.getClientPaymentData = this.getClientPaymentData.bind(this);
+    this.removeDuplicate = this.removeDuplicate.bind(this);
   }
+
+  static sortDate = (rowA, rowB, columnId, desc) => {
+    const dateA = rowA.values[columnId];
+    const dateB = rowB.values[columnId];
+    if (desc) {
+      if (!dateA) {
+        return -1;
+      }
+      if (!dateB) {
+        return 1;
+      }
+    }
+    return dateA > dateB ? 1 : -1;
+  };
 
   componentDidMount() {
     serverFunctions
@@ -62,6 +78,7 @@ class DataLayer extends React.Component {
           const tableHeader = { accessor: `${index}`, Header: header };
           if (dateFields.includes(index)) {
             tableHeader.EditableCell = EditableDateCell;
+            tableHeader.sortType = DataLayer.sortDate;
           }
           return tableHeader;
         });
@@ -118,6 +135,13 @@ class DataLayer extends React.Component {
     return DataLayer.getDateDifExclusive(date1, date2) + 1;
   }
 
+  removeDuplicate(id) {
+    console.log('removeDuplicate(id)', id);
+    serverFunctions.removeDuplicate(id).then(() => {
+      this.componentDidMount();
+    });
+  }
+
   addPaymentRecord(data, rate, companyName, initials, datePaid) {
     this.setState({ loaded: false });
     serverFunctions
@@ -131,7 +155,6 @@ class DataLayer extends React.Component {
         })
       )
       .then(() => {
-        // eslint-disable-next-line no-restricted-globals
         this.componentDidMount();
       });
   }
@@ -157,6 +180,7 @@ class DataLayer extends React.Component {
       getClientPaymentData: this.getClientPaymentData,
       updateClientData: this.updateClientData,
       addPaymentRecord: this.addPaymentRecord,
+      removeDuplicate: this.removeDuplicate,
     };
 
     return (

@@ -24,6 +24,7 @@ import { getDate } from '@shared/utils';
 import {
   CLIENT_SHEET_INDEX,
   getClientSheet,
+  getSheetValues,
   getPaymentSheetValues,
   onEdit,
   updatePaymentData,
@@ -38,6 +39,20 @@ export const doGet = () => {
   return HtmlService.createHtmlOutputFromFile(fileName)
     .setTitle(title)
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DEFAULT);
+};
+
+export const removeDuplicate = id => {
+  const clientSheet = getSheet(CLIENT_SHEET_INDEX);
+  const clientSheetValues = getSheetValues(clientSheet);
+  const clientIndex = clientSheetValues.findIndex(
+    client => client[CLIENT_ID_INDEX_ON_CLIENT_SHEET] === id
+  );
+  console.log('clientIndex', clientIndex, id);
+  if (clientIndex > -1) {
+    console.log('deleteRow', clientIndex + 2);
+
+    clientSheet.deleteRow(clientIndex + 2); // account for not starting by zero and header
+  }
 };
 
 export const getTotalsAndClientData = () => {
@@ -117,7 +132,7 @@ export const updateClientData = clients => {
   const clientsData =
     typeof clients === 'string' ? [JSON.parse(clients)] : clients;
   const clientSheet = getSheet(CLIENT_SHEET_INDEX);
-  const clientSheetValues = clientSheet.getDataRange().getValues();
+  const clientSheetValues = getSheetValues(clientSheet);
   const clientSheetIndexMap = {};
   clientSheetValues.forEach((client, index) => {
     clientSheetIndexMap[client[CLIENT_ID_INDEX_ON_CLIENT_SHEET]] = index;
