@@ -135,7 +135,7 @@ export const updateClientData = clients => {
   const clientSheetValues = getSheetValues(clientSheet);
   const clientSheetIndexMap = {};
   clientSheetValues.forEach((client, index) => {
-    clientSheetIndexMap[client[CLIENT_ID_INDEX_ON_CLIENT_SHEET]] = index;
+    clientSheetIndexMap[client[CLIENT_ID_INDEX_ON_CLIENT_SHEET]] = index + 1;
   });
   clientsData.forEach(client => {
     const clientId = client[CLIENT_ID_INDEX_ON_CLIENT_SHEET];
