@@ -53,6 +53,7 @@ export const removeDuplicate = id => {
 
     clientSheet.deleteRow(clientIndex + 2); // account for not starting by zero and header
   }
+  return JSON.stringify(getSheetValues(clientSheet));
 };
 
 export const getTotalsAndClientData = () => {
@@ -135,7 +136,7 @@ export const updateClientData = clients => {
   const clientSheetValues = getSheetValues(clientSheet);
   const clientSheetIndexMap = {};
   clientSheetValues.forEach((client, index) => {
-    clientSheetIndexMap[client[CLIENT_ID_INDEX_ON_CLIENT_SHEET]] = index + 1;
+    clientSheetIndexMap[client[CLIENT_ID_INDEX_ON_CLIENT_SHEET]] = index;
   });
   clientsData.forEach(client => {
     const clientId = client[CLIENT_ID_INDEX_ON_CLIENT_SHEET];
@@ -156,8 +157,11 @@ export const updateClientData = clients => {
       );
     }
     console.log('currentRow', currentRow);
-    setSheetRow(clientSheet, indexOnClientSheet, currentRow);
+    // Plus 1 because this index is with a removed header row
+    setSheetRow(clientSheet, indexOnClientSheet + 1, currentRow);
   });
+
+  return JSON.stringify(getSheetValues(clientSheet));
 };
 
 export const addPaymentRecord = data => {

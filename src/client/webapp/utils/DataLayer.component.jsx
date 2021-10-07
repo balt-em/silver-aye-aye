@@ -2,14 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {
   CLIENT_ID_INDEX_ON_CLIENT_SHEET,
-  CLIENT_HOOK_UP_DATE_INDEX_ON_CLIENT_SHEET,
-  CLIENTS_NEXT_COURT_DATE_INDEX_ON_CLIENT_SHEET,
-  CLIENTS_DATE_OF_BIRTH_INDEX_ON_CLIENT_SHEET,
-  TERMINATION_DATE_INDEX_ON_CLIENT_SHEET,
-  PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET,
-  SUBMITTED_ON_INDEX_ON_CLIENT_SHEET,
-  RESCHEULED_COURT_DATE_INDEX_ON_CLIENT_SHEET,
-  PAYMENT_PICKUP_DATE_INDEX_ON_CLIENT_SHEET,
+  dateFields,
 } from '@shared/sheetconfig';
 import { getDate } from '@shared/utils';
 import server from './server';
@@ -58,22 +51,29 @@ class DataLayer extends React.Component {
     return dateA > dateB ? 1 : -1;
   };
 
+  static formatClientData(data) {
+    return data.map(row => {
+      const rowMap = {};
+      row.forEach((field, index) => {
+        if (dateFields.includes(index) && field) {
+          rowMap[index] = getDate(field);
+        } else if (dateFields.includes(index)) {
+          rowMap[index] = undefined;
+        } else {
+          rowMap[index] = field;
+        }
+      });
+      rowMap.id = row[CLIENT_ID_INDEX_ON_CLIENT_SHEET];
+      return rowMap;
+    });
+  }
+
   componentDidMount() {
     serverFunctions
       .getTotalsAndClientData()
       .then(data => {
         const { clientData, totals } = JSON.parse(data);
         const [headers, ...rows] = clientData;
-        const dateFields = [
-          RESCHEULED_COURT_DATE_INDEX_ON_CLIENT_SHEET,
-          PAYMENT_PICKUP_DATE_INDEX_ON_CLIENT_SHEET,
-          CLIENT_HOOK_UP_DATE_INDEX_ON_CLIENT_SHEET,
-          CLIENTS_NEXT_COURT_DATE_INDEX_ON_CLIENT_SHEET,
-          CLIENTS_DATE_OF_BIRTH_INDEX_ON_CLIENT_SHEET,
-          TERMINATION_DATE_INDEX_ON_CLIENT_SHEET,
-          PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET,
-          SUBMITTED_ON_INDEX_ON_CLIENT_SHEET,
-        ];
         const clientSheetHeaders = headers.map((header, index) => {
           const tableHeader = { accessor: `${index}`, Header: header };
           if (dateFields.includes(index)) {
@@ -82,20 +82,7 @@ class DataLayer extends React.Component {
           }
           return tableHeader;
         });
-        const clientSheetData = rows.map(row => {
-          const rowMap = {};
-          row.forEach((field, index) => {
-            if (dateFields.includes(index) && field) {
-              rowMap[index] = getDate(field);
-            } else if (dateFields.includes(index)) {
-              rowMap[index] = undefined;
-            } else {
-              rowMap[index] = field;
-            }
-          });
-          rowMap.id = row[CLIENT_ID_INDEX_ON_CLIENT_SHEET];
-          return rowMap;
-        });
+        const clientSheetData = DataLayer.formatClientData(rows);
 
         this.setState(() => ({
           clientSheetData,
@@ -136,9 +123,14 @@ class DataLayer extends React.Component {
   }
 
   removeDuplicate(id) {
+    this.setState({ loaded: false });
+
     console.log('removeDuplicate(id)', id);
-    serverFunctions.removeDuplicate(id).then(() => {
-      this.componentDidMount();
+    serverFunctions.removeDuplicate(id).then(clientData => {
+      const formattedClientData = DataLayer.formatClientData(
+        JSON.parse(clientData)
+      );
+      this.setState({ clientSheetData: formattedClientData, loaded: true });
     });
   }
 
@@ -161,8 +153,15 @@ class DataLayer extends React.Component {
 
   // eslint-disable-next-line class-methods-use-this
   updateClientData(data) {
+    this.setState({ loaded: false });
+
     console.log('called updateData callback', data);
-    serverFunctions.updateClientData(JSON.stringify(data));
+    serverFunctions.updateClientData(JSON.stringify(data)).then(clientData => {
+      const formattedClientData = DataLayer.formatClientData(
+        JSON.parse(clientData)
+      );
+      this.setState({ clientSheetData: formattedClientData, loaded: true });
+    });
   }
 
   getClientPaymentData(clientId) {
