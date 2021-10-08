@@ -12,9 +12,18 @@ import MiscellaneousClientData from './MiscellaneousClientData.component';
 import ClientPaymentOverview from './ClientPaymentOverview.component';
 import ClientPaymentBreakdown from './ClientPaymentBreakdown.component';
 import ConfirmModal from '../../components/ConfirmModal.component';
+import EditableTextArea from '../../components/EditableTextArea.component';
 
 class DetailPage extends React.Component {
   static contextType = DataLayerContext;
+
+  onSaveNotes = note => {
+    const newData = {
+      ...this.props.clientData,
+      [NOTES_INDEX_ON_CLIENT_SHEET]: note,
+    };
+    this.context.updateClientData(newData);
+  };
 
   render() {
     const { clientData } = this.props;
@@ -62,7 +71,10 @@ class DetailPage extends React.Component {
             </div>
             <div className="col-3">
               <h3>Notes</h3>
-              <p>{clientData[NOTES_INDEX_ON_CLIENT_SHEET]}</p>
+              <EditableTextArea
+                value={clientData[NOTES_INDEX_ON_CLIENT_SHEET]}
+                onSave={this.onSaveNotes}
+              ></EditableTextArea>
             </div>
           </div>
           <div className="row">
