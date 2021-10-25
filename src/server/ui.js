@@ -187,16 +187,17 @@ export const addPaymentRecord = data => {
   newPaymentRecord[COMPANY_NAME_INDEX_ON_PAYMENT_OVERVIEW_SHEET] = companyName;
 
   const formattedPaymentBreakdownData = paymentBreakdownData.map(client => {
-    const { startDate, endDate, id, terminationDate } = client;
+    const { startDate, endDate, id, terminationDate, notes } = client;
     const paidThroughDate =
       client[PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET] &&
       getDate(client[PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET]);
     const eDate = endDate && getDate(endDate);
     const sDate = endDate && getDate(startDate);
     const tDate = terminationDate && getDate(terminationDate);
-    const record = Array(5);
+    const record = Array(6);
     record[CLIENT_ID_INDEX_ON_PAYMENT_SHEET] = id;
     record[PAYMENT_ID_INDEX_ON_PAYMENT_SHEET] = paymentId;
+    record[NOTES_INDEX_ON_PAYMENT_SHEET] = notes;
     if (startDate && endDate) {
       record[START_DATE_INDEX_ON_PAYMENT_SHEET] = sDate;
       record[END_DATE_INDEX_ON_PAYMENT_SHEET] = eDate;

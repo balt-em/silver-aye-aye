@@ -15,6 +15,11 @@
   z-index: 1;
 }
 
+th,
+td {
+  min-width: 100px;
+}
+
 .vertical-table .scrollable {
   max-height: 45px;
 }
