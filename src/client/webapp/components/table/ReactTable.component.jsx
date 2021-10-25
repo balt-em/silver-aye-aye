@@ -56,7 +56,12 @@ function ReactTable(props) {
   const columns = React.useMemo(() => props.columns, []);
 
   const useTableArgs = [
-    { columns, data, defaultColumn, updateData: props.updateData },
+    {
+      columns,
+      data,
+      defaultColumn,
+      updateData: props.updateData,
+    },
     useGlobalFilter,
     useSortBy,
   ];

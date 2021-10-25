@@ -10,6 +10,7 @@ import {
 import PropTypes from 'prop-types';
 import ReactTable from './table/ReactTable.component';
 import EditableDateCell from './table/EditableDateCell.component';
+import EditableTextCell from './table/EditableTextCell.component';
 
 class PaymentRecordTable extends React.Component {
   static contextType = DataLayerContext;
@@ -28,6 +29,11 @@ class PaymentRecordTable extends React.Component {
         accessor: 'terminationDate',
         Header: 'Termination Date',
         Cell: EditableDateCell,
+      },
+      {
+        accessor: 'notes',
+        Header: 'Notes',
+        Cell: EditableTextCell,
       },
       { accessor: 'paid', Header: 'Amount Paid' },
       { accessor: 'reimbursementUsed', Header: 'Reimbursement Used' },

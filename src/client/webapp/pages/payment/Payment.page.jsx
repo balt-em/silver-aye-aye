@@ -8,6 +8,7 @@ import DataLayer, { DataLayerContext } from '@utils/DataLayer.component';
 import {
   CLIENT_ID_INDEX_ON_CLIENT_SHEET,
   PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET,
+  CASE_NUMBER_INDEX_ON_CLIENT_SHEET,
   TERMINATION_DATE_INDEX_ON_CLIENT_SHEET,
   REIMBURSEMENT_OWED_INDEX_ON_CLIENT_SHEET,
   NUMBER_OF_DAYS_OWED_INDEX_ON_CLIENT_SHEET,
@@ -16,6 +17,7 @@ import {
 import ReactTable from '../../components/table/ReactTable.component';
 import CollapsableCard from '../../components/CollapsableCard.component';
 import PaymentRecordTable from '../../components/PaymentRecordTable.component';
+import ConfirmModal from '../../components/ConfirmModal.component';
 
 class PaymentPage extends React.Component {
   static contextType = DataLayerContext;
@@ -175,9 +177,11 @@ class PaymentPage extends React.Component {
     const headers = this.context.clientSheetHeaders;
     const newHeaders = [
       headers[CLIENT_ID_INDEX_ON_CLIENT_SHEET],
+      headers[CASE_NUMBER_INDEX_ON_CLIENT_SHEET],
       headers[CLIENT_NAME_INDEX_ON_CLIENT_SHEET],
       headers[NUMBER_OF_DAYS_OWED_INDEX_ON_CLIENT_SHEET],
       headers[PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET],
+      headers[REIMBURSEMENT_OWED_INDEX_ON_CLIENT_SHEET],
       headers[TERMINATION_DATE_INDEX_ON_CLIENT_SHEET],
     ];
 
@@ -251,14 +255,14 @@ class PaymentPage extends React.Component {
             <Card.Text>No Clients Yet Selected</Card.Text>
           )}
           <Card.Footer>
-            <button
-              style={{ float: 'right', width: '10rem' }}
-              className="btn btn-primary"
-              type="button"
-              onClick={this.savePaymentRecord}
-            >
-              Save
-            </button>
+            <ConfirmModal
+              modalText={
+                'Are you sure this data is accurate and ready for submission?'
+              }
+              variant={'success'}
+              buttonText={'Save'}
+              onConfirm={this.savePaymentRecord}
+            ></ConfirmModal>
           </Card.Footer>
         </CollapsableCard>
       </div>

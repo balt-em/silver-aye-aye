@@ -24,6 +24,7 @@ import { getDate } from '@shared/utils';
 import {
   CLIENT_SHEET_INDEX,
   getClientSheet,
+  getSheetValues,
   getPaymentSheetValues,
   onEdit,
   updatePaymentData,
@@ -38,6 +39,21 @@ export const doGet = () => {
   return HtmlService.createHtmlOutputFromFile(fileName)
     .setTitle(title)
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DEFAULT);
+};
+
+export const removeDuplicate = id => {
+  const clientSheet = getSheet(CLIENT_SHEET_INDEX);
+  const clientSheetValues = getSheetValues(clientSheet);
+  const clientIndex = clientSheetValues.findIndex(
+    client => client[CLIENT_ID_INDEX_ON_CLIENT_SHEET] === id
+  );
+  console.log('clientIndex', clientIndex, id);
+  if (clientIndex > -1) {
+    console.log('deleteRow', clientIndex + 2);
+
+    clientSheet.deleteRow(clientIndex + 2); // account for not starting by zero and header
+  }
+  return JSON.stringify(getSheetValues(clientSheet));
 };
 
 export const getTotalsAndClientData = () => {
@@ -117,7 +133,7 @@ export const updateClientData = clients => {
   const clientsData =
     typeof clients === 'string' ? [JSON.parse(clients)] : clients;
   const clientSheet = getSheet(CLIENT_SHEET_INDEX);
-  const clientSheetValues = clientSheet.getDataRange().getValues();
+  const clientSheetValues = getSheetValues(clientSheet);
   const clientSheetIndexMap = {};
   clientSheetValues.forEach((client, index) => {
     clientSheetIndexMap[client[CLIENT_ID_INDEX_ON_CLIENT_SHEET]] = index;
@@ -141,8 +157,11 @@ export const updateClientData = clients => {
       );
     }
     console.log('currentRow', currentRow);
-    setSheetRow(clientSheet, indexOnClientSheet, currentRow);
+    // Plus 1 because this index is with a removed header row
+    setSheetRow(clientSheet, indexOnClientSheet + 1, currentRow);
   });
+
+  return JSON.stringify(getSheetValues(clientSheet));
 };
 
 export const addPaymentRecord = data => {
@@ -168,16 +187,17 @@ export const addPaymentRecord = data => {
   newPaymentRecord[COMPANY_NAME_INDEX_ON_PAYMENT_OVERVIEW_SHEET] = companyName;
 
   const formattedPaymentBreakdownData = paymentBreakdownData.map(client => {
-    const { startDate, endDate, id, terminationDate } = client;
+    const { startDate, endDate, id, terminationDate, notes } = client;
     const paidThroughDate =
       client[PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET] &&
       getDate(client[PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET]);
     const eDate = endDate && getDate(endDate);
     const sDate = endDate && getDate(startDate);
     const tDate = terminationDate && getDate(terminationDate);
-    const record = Array(5);
+    const record = Array(6);
     record[CLIENT_ID_INDEX_ON_PAYMENT_SHEET] = id;
     record[PAYMENT_ID_INDEX_ON_PAYMENT_SHEET] = paymentId;
+    record[NOTES_INDEX_ON_PAYMENT_SHEET] = notes;
     if (startDate && endDate) {
       record[START_DATE_INDEX_ON_PAYMENT_SHEET] = sDate;
       record[END_DATE_INDEX_ON_PAYMENT_SHEET] = eDate;

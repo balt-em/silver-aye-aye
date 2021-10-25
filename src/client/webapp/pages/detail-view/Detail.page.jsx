@@ -6,56 +6,81 @@ import {
   NOTES_INDEX_ON_CLIENT_SHEET,
   CLIENT_ID_INDEX_ON_CLIENT_SHEET,
 } from '@shared/sheetconfig';
+import { DataLayerContext } from '@utils/DataLayer.component';
 import ClientOverviewData from './ClientOverviewData.component';
 import MiscellaneousClientData from './MiscellaneousClientData.component';
 import ClientPaymentOverview from './ClientPaymentOverview.component';
 import ClientPaymentBreakdown from './ClientPaymentBreakdown.component';
+import ConfirmModal from '../../components/ConfirmModal.component';
+import EditableTextArea from '../../components/EditableTextArea.component';
 
 class DetailPage extends React.Component {
+  static contextType = DataLayerContext;
+
+  onSaveNotes = note => {
+    const newData = {
+      ...this.props.clientData,
+      [NOTES_INDEX_ON_CLIENT_SHEET]: note,
+    };
+    this.context.updateClientData(newData);
+  };
+
   render() {
+    const { clientData } = this.props;
+
     return (
       <Modal
         show={this.props.show}
         onHide={() => this.props.setModal(false)}
         dialogClassName="detail-modal"
         size="lg"
-        aria-labelledby="example-custom-modal-styling-title"
+        aria-labelledby="detail-page"
       >
         <Modal.Header closeButton>
-          <Modal.Title id="example-custom-modal-styling-title">
-            {this.props.clientData[CLIENT_NAME_INDEX_ON_CLIENT_SHEET]}
+          <Modal.Title style={{ width: '100%' }} id="detail-page">
+            <span>{clientData[CLIENT_NAME_INDEX_ON_CLIENT_SHEET]}</span>
+            <ConfirmModal
+              modalText={
+                'This duplicate will be permanently removed from the client sheet.'
+              }
+              buttonText={'Mark as Duplicate and Remove'}
+              onConfirm={() => {
+                this.context.removeDuplicate(
+                  clientData[CLIENT_ID_INDEX_ON_CLIENT_SHEET]
+                );
+              }}
+            ></ConfirmModal>
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <div className="row">
             <div className="col-6">
-              <ClientOverviewData
-                clientData={this.props.clientData}
-              ></ClientOverviewData>
+              <ClientOverviewData clientData={clientData}></ClientOverviewData>
             </div>
             <div className="col-6">
               <MiscellaneousClientData
-                clientData={this.props.clientData}
+                clientData={clientData}
               ></MiscellaneousClientData>
             </div>
           </div>
           <div className="row">
             <div className="col-9">
               <ClientPaymentOverview
-                clientData={this.props.clientData}
+                clientData={clientData}
               ></ClientPaymentOverview>
             </div>
             <div className="col-3">
               <h3>Notes</h3>
-              <p>{this.props.clientData[NOTES_INDEX_ON_CLIENT_SHEET]}</p>
+              <EditableTextArea
+                value={clientData[NOTES_INDEX_ON_CLIENT_SHEET]}
+                onSave={this.onSaveNotes}
+              ></EditableTextArea>
             </div>
           </div>
           <div className="row">
             <div className="col-12">
               <ClientPaymentBreakdown
-                clientId={
-                  this.props.clientData[CLIENT_ID_INDEX_ON_CLIENT_SHEET]
-                }
+                clientId={clientData[CLIENT_ID_INDEX_ON_CLIENT_SHEET]}
               ></ClientPaymentBreakdown>
             </div>
           </div>
