@@ -19,10 +19,10 @@ import {
   DATE_PAID_INDEX_ON_PAYMENT_OVERVIEW_SHEET,
   PAID_BY_INDEX_ON_PAYMENT_OVERVIEW_SHEET,
   PAID_THROUGH_DATE_INDEX_ON_CLIENT_SHEET,
+  CLIENT_SHEET_INDEX,
 } from '@shared/sheetconfig';
 import { getDate } from '@shared/utils';
 import {
-  CLIENT_SHEET_INDEX,
   getClientSheet,
   getSheetValues,
   getPaymentSheetValues,

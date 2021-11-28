@@ -1,17 +1,15 @@
 /* eslint-disable no-unused-vars */
-import { CLIENT_NAME_INDEX_ON_INTAKE_FORM } from '@shared/sheetconfig';
-import { getDate } from '@shared/utils';
-
-import { v4 as uuidv4 } from 'uuid';
 import {
-  getSheets,
-  getSheetValues,
-  setSheetValues,
+  CLIENT_NAME_INDEX_ON_INTAKE_FORM,
   INTAKE_FORM_SHEET_INDEX,
   CLIENT_SHEET_INDEX,
   PAYMENT_BREAKDOWN_SHEET_INDEX,
   PAYMENT_OVERVIEW_SHEET_INDEX,
-} from './sheets';
+} from '@shared/sheetconfig';
+import { getDate } from '@shared/utils';
+
+import { v4 as uuidv4 } from 'uuid';
+import { getSheets, getSheetValues, setSheetValues } from './sheets';
 
 const [
   NAME_INDEX_ON_BALT_PAYMENT_SHEET,
@@ -59,26 +57,6 @@ const formatIndividualClientData = (uuid, clientData, matchingAsapRow) => {
     terminated,
     ...remainingIntakeData,
   ];
-};
-
-// IMPORTANT!!!:: update this if column ordering changes and migration is needed
-const setClientSheetData = (intakeFormData, clientSheet) => {
-  const clientNameToIdMap = {};
-  const formattedData = intakeFormData.map(row => {
-    const uuid = uuidv4();
-    const [submittedOn, clientName, ...remainingIntakeData] = row; // <--- SEE ABOVE COMMENT
-    clientNameToIdMap[clientName] = uuid;
-    return [
-      uuid,
-      submittedOn,
-      clientName,
-      ...Array(7), // leave blank space for calculated columns and termination date
-      ...remainingIntakeData,
-    ];
-  });
-
-  setSheetValues(clientSheet, formattedData);
-  return formattedData;
 };
 
 // Input
@@ -227,20 +205,26 @@ export const migrateData = () => {
 
   const intakeFormValues = getSheetValues(intakeSheet);
   const asapSheetValues = getSheetValues(sheets[4]);
-  // const alertSheetValues = getSheetValues(sheets[5]);
-  const formattedData = matchClientDataWithPaymentData(
+  const alertSheetValues = getSheetValues(sheets[5]);
+  const formattedAsapData = matchClientDataWithPaymentData(
     intakeFormValues,
     asapSheetValues
   );
+  const formattedAlertData = matchClientDataWithPaymentData(
+    intakeFormValues,
+    alertSheetValues
+  );
 
-  setSheetValues(clientSheet, formattedData.formattedIntakeFormData);
-  setSheetValues(
-    paymentOverviewSheet,
-    formattedData.formattedPaymentOverviewData
-  );
-  setSheetValues(
-    paymentBreakdownSheet,
-    formattedData.formattedPaymentBreakdownData
-  );
-  // Then repeat for alert ^^
+  setSheetValues(clientSheet, [
+    ...formattedAsapData.formattedIntakeFormData,
+    ...formattedAlertData.formattedIntakeFormData,
+  ]);
+  setSheetValues(paymentOverviewSheet, [
+    ...formattedAsapData.formattedPaymentOverviewData,
+    ...formattedAlertData.formattedPaymentOverviewData,
+  ]);
+  setSheetValues(paymentBreakdownSheet, [
+    ...formattedAsapData.formattedPaymentBreakdownData,
+    ...formattedAlertData.formattedPaymentBreakdownData,
+  ]);
 };

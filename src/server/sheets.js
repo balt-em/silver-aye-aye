@@ -1,7 +1,7 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable no-console */
 
 import {
+  SPREADSHEET_URL,
   CLIENT_ID_INDEX_ON_CLIENT_SHEET,
   TOTAL_PAID_INDEX_ON_CLIENT_SHEET,
   NUMBER_OF_DAYS_OWED_INDEX_ON_CLIENT_SHEET,
@@ -18,20 +18,32 @@ import {
   PAYMENT_ID_INDEX_ON_PAYMENT_OVERVIEW_SHEET,
   RATE_INDEX_ON_PAYMENT_OVERVIEW_SHEET,
   TOTAL_INDEX_ON_PAYMENT_OVERVIEW_SHEET,
-} from '@shared/sheetconfig';
-import { getDate } from '@shared/utils';
-
-export const [
-  INTAKE_FORM_SHEET_INDEX,
   CLIENT_SHEET_INDEX,
   PAYMENT_BREAKDOWN_SHEET_INDEX,
   PAYMENT_OVERVIEW_SHEET_INDEX,
-] = [...Array(4).keys()];
+} from '@shared/sheetconfig';
+import { getDate } from '@shared/utils';
 
-// TODO we need to figure out a better way to assigned sequential numbers for our rows
-const spreadsheetUrl =
-  'https://docs.google.com/spreadsheets/d/1wyPjcdA8DVUeCbyYCanyOaBxcv_YlJK8WIrPnQ0JeOk/edit#gid=518849693';
-// 'https://docs.google.com/spreadsheets/d/1GWh-B_IMmvNniy2p82CKQ9X-eepwx70BG50xCM5r2bo/edit#gid=1404273585';
+// take a boolean 'useUrl', you have to use a URL if calling from the UI, and can't use one if the
+// script being run is directly attached to a google sheet (aka onEdit)
+export function getSheets(useUrl) {
+  if (useUrl) {
+    console.log('SPREADSHEET_URL', SPREADSHEET_URL);
+    return SpreadsheetApp.openByUrl(SPREADSHEET_URL).getSheets();
+  }
+  return SpreadsheetApp.getActive().getSheets();
+}
+
+export const getSheet = (index, useUrl) => {
+  return getSheets(useUrl)[index];
+};
+
+export const getSheetValues = sheet => {
+  return sheet
+    .getDataRange()
+    .getValues()
+    .slice(1);
+};
 
 // https://stackoverflow.com/questions/2627473/how-to-calculate-the-number-of-days-between-two-dates
 // the difference between two dates including the start OR the end date: 1/1 - 1/1 is 0 days
@@ -46,15 +58,6 @@ function getDateDifExclusive(date1, date2) {
 // the difference between two dates including the start and end date:  1/1 - 1/1 is 1 day
 function getDateDifInclusive(date1, date2) {
   return getDateDifExclusive(date1, date2) + 1;
-}
-
-// take a boolean 'useUrl', you have to use a URL if calling from the UI, and can't use one if the
-// script being run is directly attached to a google sheet (aka onEdit)
-export function getSheets(useUrl) {
-  if (useUrl) {
-    return SpreadsheetApp.openByUrl(spreadsheetUrl).getSheets();
-  }
-  return SpreadsheetApp.getActive().getSheets();
 }
 
 // takes a google sheet, and a dictionary going from some id to a value, a columnWithIdsIndex in the sheet,
@@ -114,8 +117,6 @@ function updateTotalCosts(
     } else if (oldPaymentPickupDate > startDate) {
       paymentPickupDateDict[clientId] = startDate;
     }
-
-    const endDate = row[END_DATE_INDEX_ON_PAYMENT_SHEET];
   });
   //  get the earliest startDate
 
@@ -289,6 +290,7 @@ function getClientTerminationDateDict(clientData) {
 
 export const onEdit = e => {
   console.time('onEdit time');
+  console.log('onEdit,  range', e);
   const sheets = getSheets(false);
   const sheetValues = sheets.map(sheet =>
     sheet
@@ -345,17 +347,6 @@ export const updatePaymentData = (paymentOverviewRow, paymentBreakdownData) => {
   );
   dataRange.setValues(paymentBreakdownData);
   // return clientSheet.getDataRange().getValues();
-};
-
-export const getSheet = (index, useUrl) => {
-  return getSheets(useUrl)[index];
-};
-
-export const getSheetValues = sheet => {
-  return sheet
-    .getDataRange()
-    .getValues()
-    .slice(1);
 };
 
 export const setSheetValues = (sheet, formattedData) => {
