@@ -5,6 +5,7 @@ import {
   CLIENT_SHEET_INDEX,
   PAYMENT_BREAKDOWN_SHEET_INDEX,
   PAYMENT_OVERVIEW_SHEET_INDEX,
+  SUBMITTED_ON_INDEX_ON_INTAKE_SHEET,
 } from '@shared/sheetconfig';
 import { getDate } from '@shared/utils';
 
@@ -44,18 +45,20 @@ export const onOpen = () => {
 };
 
 const formatIndividualClientData = (uuid, clientData, matchingAsapRow) => {
-  const [submittedOn, clientName, ...remainingIntakeData] = clientData; // <--- SEE ABOVE COMMENT
+  const [_, clientName, ...remainingIntakeData] = clientData; // <--- SEE ABOVE COMMENT
   const terminated =
     matchingAsapRow[STILL_PAYING_INDEX_ON_BALT_PAYMENT_SHEET] === 'No'
       ? ''
       : matchingAsapRow[STILL_PAYING_INDEX_ON_BALT_PAYMENT_SHEET];
+  const submittedOn = clientData[SUBMITTED_ON_INDEX_ON_INTAKE_SHEET];
+  // const clientName = clientData[clientData.length - 1];
   return [
     uuid,
     submittedOn,
     clientName,
     ...Array(6), // leave blank space for calculated columns and termination date
     terminated,
-    ...remainingIntakeData,
+    ...remainingIntakeData.slice(0, -1),
   ];
 };
 
@@ -102,7 +105,11 @@ const groupPaymentData = paymentData => {
   return paymentsGroupedByDate;
 };
 
-const matchClientDataWithPaymentData = (intakeFormValues, asapSheetValues) => {
+const matchClientDataWithPaymentData = (
+  intakeFormValues,
+  asapSheetValues,
+  companyName
+) => {
   const matchedValues = [];
   const asapMap = {}; // client Name: last row in ASAP table for that name, sans duplicates
   asapSheetValues.forEach(row => {
@@ -154,7 +161,7 @@ const matchClientDataWithPaymentData = (intakeFormValues, asapSheetValues) => {
             datePaid: payment[DATE_PAID_INDEX_FOR_PAYMENT_DATA],
             notes: payment[NOTES_INDEX_FOR_PAYMENT_DATA],
             paidBy: payment[PAID_BY_INDEX_FOR_PAYMENT_DATA],
-            company: 'ASAP', // change for ALERT
+            company: companyName,
           };
           paymentData.push(paymentObj);
         }
@@ -168,7 +175,13 @@ const matchClientDataWithPaymentData = (intakeFormValues, asapSheetValues) => {
   Object.keys(groupedPaymentData).forEach(key => {
     const payment = groupedPaymentData[key];
     // Payment Id	Rate/Day	Date Paid	Paid by
-    const formattedPayment = [payment.id, payment.rate, key, payment.paidBy]; // CHANGE IF COLUMN CHANGE
+    const formattedPayment = [
+      payment.id,
+      payment.rate,
+      key,
+      payment.paidBy,
+      companyName,
+    ]; // CHANGE IF COLUMNS CHANGE
     formattedPaymentOverviewData.push(formattedPayment);
     const { payments } = payment;
     // Client Id	Payment Id	Start Date	End Date	Reimbursement?	Notes
@@ -208,11 +221,13 @@ export const migrateData = () => {
   const alertSheetValues = getSheetValues(sheets[5]);
   const formattedAsapData = matchClientDataWithPaymentData(
     intakeFormValues,
-    asapSheetValues
+    asapSheetValues,
+    'ASAP'
   );
   const formattedAlertData = matchClientDataWithPaymentData(
     intakeFormValues,
-    alertSheetValues
+    alertSheetValues,
+    'ALERT'
   );
 
   setSheetValues(clientSheet, [

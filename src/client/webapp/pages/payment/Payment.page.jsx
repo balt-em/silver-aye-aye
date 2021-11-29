@@ -194,7 +194,7 @@ class PaymentPage extends React.Component {
           <ReactTable
             columns={newHeaders}
             data={clientSheetData}
-            maxDisplay={10}
+            maxDisplay={50}
             onSelect={this.changedSelectedClients}
           />
         </CollapsableCard>
